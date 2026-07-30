@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  orders    Order[]
+}
+
+model Event {
+  id          String       @id @default(cuid())
+  title       String
+  description String
+  date        String
+  time        String
+  venue       String
+  address     String
+  city        String
+  category    String
+  organizer   String
+  image       String?
+  ticketTypes TicketType[]
+}
+
+model TicketType {
+  id          String      @id @default(cuid())
+  eventId     String
+  event       Event       @relation(fields: [eventId], references: [id])
+  name        String
+  price       Float
+  quantity    Int
+  available   Int
+  description String
+  orderItems  OrderItem[]
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  userId          String
+  user            User        @relation(fields: [userId], references: [id])
+  total           Float
+  status          String      @default("pending")
+  paymentIntentId String?
+  createdAt       DateTime    @default(now())
+  items           OrderItem[]
+}
+
+model OrderItem {
+  id             String     @id @default(cuid())
+  orderId        String
+  order          Order      @relation(fields: [orderId], references: [id])
+  eventId        String
+  eventTitle     String
+  ticketTypeId   String
+  ticketType     TicketType @relation(fields: [ticketTypeId], references: [id])
+  ticketTypeName String
+  quantity       Int
+  unitPrice      Float
+}
