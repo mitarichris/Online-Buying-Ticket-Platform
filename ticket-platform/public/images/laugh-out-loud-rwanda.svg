@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1260" viewBox="0 0 900 1260">
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3a0d3a"/>
+      <stop offset="55%" stop-color="#7a1a54"/>
+      <stop offset="100%" stop-color="#1f061f"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="38%" r="60%">
+      <stop offset="0%" stop-color="#ffd166" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#ffd166" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+<rect width="900" height="1260" fill="url(#bg)"/>
+<rect width="900" height="1260" fill="url(#glow)"/>
+<circle cx="450" cy="430" r="150" fill="#ffd166" opacity="0.9"/>
+<path d="M360 430 q30 -60 90 -60 q60 0 90 60" fill="none" stroke="#3a0d3a" stroke-width="14" stroke-linecap="round"/>
+<circle cx="405" cy="400" r="16" fill="#3a0d3a"/><circle cx="495" cy="400" r="16" fill="#3a0d3a"/>
+
+  <text x="50%" y="830" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
+        font-size="72" font-weight="800" fill="#ffffff" textLength="820" lengthAdjust="spacingAndGlyphs">LAUGH OUT LOUD</text>
+  <rect x="415" y="890" width="70" height="8" rx="4" fill="#ffd166"/>
+  <text x="50%" y="960" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
+        font-size="52" font-weight="600" letter-spacing="6" fill="#ffffff" opacity="0.92">COMEDY</text>
+</svg>

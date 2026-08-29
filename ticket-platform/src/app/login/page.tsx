@@ -8,8 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
+import { useLanguage } from "@/i18n/LanguageProvider";
 
 export default function LoginPage() {
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -25,10 +27,10 @@ export default function LoginPage() {
     });
 
     if (result?.error) {
-      toast.error("Invalid email or password");
+      toast.error(t("login.invalid"));
       setLoading(false);
     } else {
-      router.push("/events");
+      router.push("/");
       router.refresh();
     }
   }
@@ -37,8 +39,8 @@ export default function LoginPage() {
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <h1 className="text-2xl font-bold text-gray-900">Sign In</h1>
-          <p className="text-sm text-gray-500">Welcome back! Sign in to your account.</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("login.title")}</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t("login.welcome")}</p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -46,26 +48,26 @@ export default function LoginPage() {
               id="email"
               name="email"
               type="email"
-              label="Email"
-              placeholder="you@example.com"
+              label={t("login.email")}
+              placeholder={t("login.emailPlaceholder")}
               required
             />
             <Input
               id="password"
               name="password"
               type="password"
-              label="Password"
-              placeholder="Enter your password"
+              label={t("login.password")}
+              placeholder={t("login.passwordPlaceholder")}
               required
             />
             <Button type="submit" loading={loading} className="w-full">
-              Sign In
+              {t("login.button")}
             </Button>
           </form>
-          <p className="mt-4 text-center text-sm text-gray-500">
-            Don&apos;t have an account?{" "}
+          <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
+            {t("login.noAccount")}{" "}
             <Link href="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
-              Sign up
+              {t("login.signup")}
             </Link>
           </p>
         </CardContent>

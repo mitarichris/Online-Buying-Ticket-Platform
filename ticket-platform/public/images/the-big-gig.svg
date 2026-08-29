@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1260" viewBox="0 0 900 1260">
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#103a4a"/>
+      <stop offset="55%" stop-color="#1e6f8a"/>
+      <stop offset="100%" stop-color="#071b22"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="38%" r="60%">
+      <stop offset="0%" stop-color="#ff8c42" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#ff8c42" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+<rect width="900" height="1260" fill="url(#bg)"/>
+<rect width="900" height="1260" fill="url(#glow)"/>
+<circle cx="450" cy="430" r="150" fill="#ff8c42" opacity="0.9"/>
+<path d="M340 470 L560 470 L450 540 Z" fill="#ffe0c2" opacity="0.9"/>
+<rect x="420" y="430" width="60" height="20" rx="6" fill="#ffd166"/>
+<circle cx="405" cy="420" r="22" fill="#103a4a"/><circle cx="495" cy="420" r="22" fill="#103a4a"/>
+<circle cx="405" cy="420" r="8" fill="#ffffff"/><circle cx="495" cy="420" r="8" fill="#ffffff"/>
+
+  <text x="50%" y="830" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
+        font-size="72" font-weight="800" fill="#ffffff" textLength="820" lengthAdjust="spacingAndGlyphs">THE BIG GIG</text>
+  <rect x="415" y="890" width="70" height="8" rx="4" fill="#ff8c42"/>
+  <text x="50%" y="960" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
+        font-size="52" font-weight="600" letter-spacing="6" fill="#ffffff" opacity="0.92">COMEDY</text>
+</svg>

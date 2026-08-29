@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1260" viewBox="0 0 900 1260">
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#061a33"/>
+      <stop offset="55%" stop-color="#0d3b66"/>
+      <stop offset="100%" stop-color="#020d1c"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="38%" r="60%">
+      <stop offset="0%" stop-color="#2ee6d6" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#2ee6d6" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+<rect width="900" height="1260" fill="url(#bg)"/>
+<rect width="900" height="1260" fill="url(#glow)"/>
+<circle cx="450" cy="420" r="150" fill="none" stroke="#2ee6d6" stroke-width="4" opacity="0.8"/>
+<circle cx="450" cy="420" r="90" fill="none" stroke="#2ee6d6" stroke-width="3" opacity="0.7"/>
+<circle cx="450" cy="420" r="30" fill="#2ee6d6" opacity="0.9"/>
+<path d="M250 520 L450 420 M650 520 L450 420 M320 640 L450 420 M580 640 L450 420" stroke="#2ee6d6" stroke-width="4" opacity="0.6"/>
+<circle cx="250" cy="520" r="14" fill="#2ee6d6"/><circle cx="650" cy="520" r="14" fill="#2ee6d6"/>
+<circle cx="320" cy="640" r="14" fill="#2ee6d6"/><circle cx="580" cy="640" r="14" fill="#2ee6d6"/>
+
+  <text x="50%" y="830" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
+        font-size="72" font-weight="800" fill="#ffffff" textLength="820" lengthAdjust="spacingAndGlyphs">AFRICA TECH</text>
+  <rect x="415" y="890" width="70" height="8" rx="4" fill="#2ee6d6"/>
+  <text x="50%" y="960" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
+        font-size="52" font-weight="600" letter-spacing="6" fill="#ffffff" opacity="0.92">CONFERENCE</text>
+</svg>

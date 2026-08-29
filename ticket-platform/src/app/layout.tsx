@@ -19,7 +19,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} min-h-screen bg-gray-50 antialiased`}>
+      <body className={`${inter.className} min-h-screen bg-white antialiased dark:bg-[#101114]`}>
         <Providers>
           <div className="flex min-h-screen flex-col">
             <Header />

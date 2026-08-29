@@ -7,7 +7,7 @@ export async function POST(request: Request) {
     const { requesttransactionid, status } = body;
 
     if (requesttransactionid && status) {
-      setTransactionStatus(requesttransactionid, status);
+      await setTransactionStatus(requesttransactionid, status);
     }
 
     return NextResponse.json({ message: "success", success: true });

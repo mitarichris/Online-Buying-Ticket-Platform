@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus } from "lucide-react";
 import type { TicketType } from "@/types";
@@ -14,13 +13,13 @@ interface TicketTypeSelectorProps {
 
 export function TicketTypeSelector({ ticketType, quantity, onQuantityChange }: TicketTypeSelectorProps) {
   return (
-    <div className="flex items-center justify-between rounded-lg border border-gray-200 p-4">
-      <div className="flex-1">
-        <h4 className="font-medium text-gray-900">{ticketType.name}</h4>
-        <p className="text-sm text-gray-500">{ticketType.description}</p>
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-gray-200 p-4">
+      <div className="min-w-0 flex-1">
+        <h4 className="font-medium text-gray-900 dark:text-white">{ticketType.name}</h4>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{ticketType.description}</p>
         <p className="mt-1 text-lg font-bold text-indigo-600">{formatCurrency(ticketType.price)}</p>
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 sm:ml-auto">
         <Button
           variant="outline"
           size="sm"

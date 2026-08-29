@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1260" viewBox="0 0 900 1260">
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4a1c0b"/>
+      <stop offset="55%" stop-color="#d2691e"/>
+      <stop offset="100%" stop-color="#1a0f05"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="38%" r="60%">
+      <stop offset="0%" stop-color="#ffd166" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#ffd166" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+<rect width="900" height="1260" fill="url(#bg)"/>
+<rect width="900" height="1260" fill="url(#glow)"/>
+<circle cx="450" cy="460" r="165" fill="#f5c26b" opacity="0.9"/>
+<path d="M300 540 q150 -260 300 0 q-60 -40 -110 0 q-40 -30 -80 0 q-40 -30 -80 0 q-40 -30 -80 0 q-50 -40 -110 0z" fill="#c0392b" opacity="0.8"/>
+
+  <text x="50%" y="830" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
+        font-size="72" font-weight="800" fill="#ffffff" textLength="820" lengthAdjust="spacingAndGlyphs">THE LION KING</text>
+  <rect x="415" y="890" width="70" height="8" rx="4" fill="#ffd166"/>
+  <text x="50%" y="960" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
+        font-size="52" font-weight="600" letter-spacing="6" fill="#ffffff" opacity="0.92">THEATER</text>
+</svg>

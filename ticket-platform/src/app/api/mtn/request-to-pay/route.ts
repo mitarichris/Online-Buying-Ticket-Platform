@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { requestToPay } from "@/lib/mtn";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -9,13 +10,20 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { amount, phoneNumber, orderId } = await request.json();
+    const { amount, phoneNumber, orderId, provider } = await request.json();
 
     if (!amount || !phoneNumber || !orderId) {
       return NextResponse.json(
         { error: "Missing required fields: amount, phoneNumber, orderId" },
         { status: 400 }
       );
+    }
+
+    if (provider && (provider === "mtn" || provider === "airtel")) {
+      await prisma.order.updateMany({
+        where: { id: orderId, userId: session.user.id },
+        data: { paymentProvider: provider },
+      }).catch(() => {});
     }
 
     const result = await requestToPay({
@@ -28,10 +36,10 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Payment error:", error);
     return NextResponse.json(
-      { error: error.message || "Payment failed" },
+      { error: error instanceof Error ? error.message : "Payment failed" },
       { status: 500 }
     );
   }

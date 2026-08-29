@@ -1,30 +1,34 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { getEventsWithTicketTypes } from "@/lib/events";
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const query = searchParams.get("q")?.toLowerCase();
-  const category = searchParams.get("category");
+  try {
+    const { searchParams } = new URL(request.url);
+    const query = searchParams.get("q")?.toLowerCase();
+    const category = searchParams.get("category");
 
-  const where: Record<string, unknown> = {};
+    let events = await getEventsWithTicketTypes();
 
-  if (query) {
-    where.OR = [
-      { title: { contains: query } },
-      { category: { contains: query } },
-      { city: { contains: query } },
-      { venue: { contains: query } },
-    ];
+    if (category?.trim()) {
+      events = events.filter((event) =>
+        event.category.toLowerCase().includes(category.trim().toLowerCase())
+      );
+    }
+
+    if (query) {
+      events = events.filter((event) =>
+        [event.title, event.category, event.city, event.venue].some((field) =>
+          field.toLowerCase().includes(query)
+        )
+      );
+    }
+
+    return NextResponse.json(events);
+  } catch (error) {
+    console.error("Failed to fetch events:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch events" },
+      { status: 500 }
+    );
   }
-
-  if (category?.trim()) {
-    where.category = { contains: category };
-  }
-
-  const events = await prisma.event.findMany({
-    where: Object.keys(where).length ? where : undefined,
-    include: { ticketTypes: true },
-  });
-
-  return NextResponse.json(events);
 }

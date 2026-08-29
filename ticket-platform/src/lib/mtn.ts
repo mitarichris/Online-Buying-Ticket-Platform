@@ -36,9 +36,11 @@ export async function requestToPay(
 export async function getTransactionStatus(
   referenceId: string
 ): Promise<string> {
-  const status = getInternalStatus(referenceId);
+  const status = await getInternalStatus(referenceId);
   if (!status) return "PENDING";
-  return status === "successful" ? "SUCCESSFUL" : "FAILED";
+  if (status === "successful") return "SUCCESSFUL";
+  if (status === "failed") return "FAILED";
+  return "PENDING";
 }
 
 export { setTransactionStatus };

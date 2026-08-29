@@ -10,9 +10,9 @@ export async function GET(
   try {
     const status = await getTransactionStatus(referenceId);
     return NextResponse.json({ status });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { error: error.message || "Failed to check status" },
+      { error: error instanceof Error ? error.message : "Failed to check status" },
       { status: 500 }
     );
   }

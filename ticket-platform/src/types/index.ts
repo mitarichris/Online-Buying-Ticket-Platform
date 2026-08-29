@@ -8,8 +8,9 @@ export interface Event {
   address: string;
   city: string;
   category: string;
-  image?: string;
   organizer: string;
+  genre?: string;
+  image?: string;
   ticketTypes: TicketType[];
 }
 
@@ -41,6 +42,8 @@ export interface Order {
   status: "pending" | "confirmed" | "cancelled" | "refunded";
   createdAt: string;
   paymentIntentId?: string;
+  paymentStatus?: string;
+  paymentProvider?: string;
 }
 
 export interface OrderItem {
