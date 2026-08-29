@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { EventCard } from "@/components/events/EventCard";
 import { EventSearch } from "@/components/events/EventSearch";
 import { useLanguage } from "@/i18n/LanguageProvider";
 import type { Event } from "@/types";
 
-export default function EventsPage() {
+function EventsList() {
   const searchParams = useSearchParams();
   const category = searchParams.get("category");
   const urlQuery = searchParams.get("q") ?? "";
@@ -86,5 +86,13 @@ export default function EventsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function EventsPage() {
+  return (
+    <Suspense fallback={null}>
+      <EventsList />
+    </Suspense>
   );
 }
