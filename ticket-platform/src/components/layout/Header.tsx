@@ -27,9 +27,8 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/90 backdrop-blur-md dark:border-white/10 dark:bg-[#101114]/90">
       <div className="relative flex h-16 items-center justify-between gap-3 px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-white">
-          <img src="/icon.svg" alt="TicketHub" className="h-8 w-8" />
-          <span>TicketHub</span>
+        <Link href="/" className="flex items-center">
+          <img src="/logo.svg" alt="TicketHub" className="h-10 w-auto sm:h-11" />
         </Link>
 
         <div className="hidden flex-1 justify-center px-8 md:flex">
