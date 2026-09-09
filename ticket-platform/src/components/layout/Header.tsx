@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Ticket, Menu, X, Home, CalendarDays, ChevronRight } from "lucide-react";
+import { Menu, X, Home, CalendarDays, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,7 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/90 backdrop-blur-md dark:border-white/10 dark:bg-[#101114]/90">
       <div className="relative flex h-16 items-center justify-between gap-3 px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-white">
-          <Ticket className="h-6 w-6 text-[#1dd171]" />
+          <img src="/icon.svg" alt="TicketHub" className="h-8 w-8" />
           <span>TicketHub</span>
         </Link>
 
