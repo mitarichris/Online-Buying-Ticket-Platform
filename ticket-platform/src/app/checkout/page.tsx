@@ -343,7 +343,7 @@ export default function CheckoutPage() {
                         <button
                           type="submit"
                           disabled={ussdPin.length < 4}
-                          className="mt-3 w-full rounded bg-[#D4AF37] py-2 text-sm font-semibold text-[#0F172A] disabled:opacity-40 hover:bg-[#B8942E] transition-colors"
+                          className="mt-3 w-full rounded bg-blue-600 py-2 text-sm font-semibold text-white disabled:opacity-40 hover:bg-blue-700 transition-colors"
                         >
                           {t("checkout.send")}
                         </button>

@@ -37,7 +37,7 @@ export default function ContactPage() {
             </div>
             <a
               href={`mailto:${email}`}
-              className="inline-flex items-center justify-center rounded-lg bg-[#D4AF37] px-4 py-2 text-sm font-semibold text-[#0F172A] transition hover:bg-[#B8942E]"
+              className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
             >
               {t("contact.mailto")}
             </a>
@@ -55,7 +55,7 @@ export default function ContactPage() {
             </div>
             <a
               href={`tel:${phone.replace(/\s/g, "")}`}
-              className="inline-flex items-center justify-center rounded-lg bg-[#D4AF37] px-4 py-2 text-sm font-semibold text-[#0F172A] transition hover:bg-[#B8942E]"
+              className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
             >
               {t("contact.call")}
             </a>
