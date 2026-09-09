@@ -58,7 +58,7 @@ export default function CartPage() {
                 </Link>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{formatDate(item.eventDate)}</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{item.ticketTypeName}</p>
-                <p className="mt-1 font-medium text-[#B8942E]">{t("cart.each", { price: formatCurrency(item.price) })}</p>
+                <p className="mt-1 font-medium text-gray-900 dark:text-white">{t("cart.each", { price: formatCurrency(item.price) })}</p>
               </div>
               <div className="flex items-center gap-2 sm:ml-auto">
                 <Button variant="outline" size="sm" onClick={() => updateQuantity(item.eventId, item.ticketTypeId, item.quantity - 1)}>

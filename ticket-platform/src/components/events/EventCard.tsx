@@ -49,7 +49,7 @@ export function EventCard({ event }: { event: Event }) {
             </div>
           </div>
           <div className="flex items-center justify-between pt-2">
-            <span className="text-lg font-bold text-[#B8942E]">
+            <span className="text-lg font-bold text-gray-900 dark:text-white">
               {t("event.from", { price: formatCurrency(Math.min(...event.ticketTypes.map((tt) => tt.price))) })}
             </span>
           </div>

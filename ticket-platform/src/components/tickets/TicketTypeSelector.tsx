@@ -17,7 +17,7 @@ export function TicketTypeSelector({ ticketType, quantity, onQuantityChange }: T
       <div className="min-w-0 flex-1">
         <h4 className="font-medium text-gray-900 dark:text-white">{ticketType.name}</h4>
         <p className="text-sm text-gray-500 dark:text-gray-400">{ticketType.description}</p>
-        <p className="mt-1 text-lg font-bold text-[#B8942E]">{formatCurrency(ticketType.price)}</p>
+        <p className="mt-1 text-lg font-bold text-gray-900 dark:text-white">{formatCurrency(ticketType.price)}</p>
       </div>
       <div className="flex items-center gap-3 sm:ml-auto">
         <Button

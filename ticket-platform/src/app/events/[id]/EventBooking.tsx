@@ -89,7 +89,7 @@ export function EventBooking({ event }: { event: Event }) {
           <div className="mt-6 border-t border-gray-200 pt-6">
             <div className="mb-4 flex items-center justify-between text-lg">
               <span className="font-semibold text-gray-900">{t("event.totalTickets", { count: totalItems })}</span>
-              <span className="font-bold text-[#B8942E]">{formatCurrency(totalPrice)}</span>
+              <span className="font-bold text-gray-900 dark:text-white">{formatCurrency(totalPrice)}</span>
             </div>
           </div>
         )}
