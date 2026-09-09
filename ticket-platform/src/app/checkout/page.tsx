@@ -236,7 +236,7 @@ export default function CheckoutPage() {
             <p className="font-medium">{formatCurrency(item.price * item.quantity)}</p>
           </div>
         ))}
-        <div className="flex justify-between border-t border-gray-200 pt-3 text-lg font-bold">
+        <div className="flex justify-between border-t border-gray-200 pt-3 text-lg font-bold text-gray-900 dark:text-white">
           <span>{t("checkout.totalFees")}</span>
           <span>{formatCurrency(total)}</span>
         </div>
