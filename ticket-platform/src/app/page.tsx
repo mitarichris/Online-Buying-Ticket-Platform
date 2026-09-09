@@ -140,8 +140,8 @@ function EventCard({ event }: { event: EventItem }) {
         </div>
       </div>
       <div className="mt-1 px-0.5">
-        <p className="text-xs text-white truncate">{event.title}</p>
-        <p className="text-[11px] text-white/70">{event.genre} &middot; {event.date}</p>
+        <p className="text-xs text-gray-900 truncate dark:text-white">{event.title}</p>
+        <p className="text-[11px] text-gray-500 dark:text-white/70">{event.genre} &middot; {event.date}</p>
       </div>
     </Link>
   );
@@ -164,8 +164,8 @@ function ContentRow({ title, events }: { title: string; events: EventItem[] }) {
   return (
     <article className="mb-8 md:mb-10">
       <div className="flex items-center justify-between px-4 md:px-5 mb-3">
-        <h2 className="text-base md:text-lg font-bold text-white">{title}</h2>
-        <Link href="/events" className="flex items-center gap-1 text-xs text-white/60 hover:text-white transition-colors">
+        <h2 className="text-base md:text-lg font-bold text-gray-900 dark:text-white">{title}</h2>
+        <Link href="/events" className="flex items-center gap-1 text-xs text-gray-500 transition-colors hover:text-gray-900 dark:text-white/60 dark:hover:text-white">
           {t("home.more")}
           <ChevronRight className="h-3 w-3" />
         </Link>
@@ -225,7 +225,7 @@ export default function HomePage() {
   const slide = featuredSlides[currentSlide];
 
   return (
-    <div className="min-h-screen bg-[#101114]">
+    <div className="min-h-screen bg-white dark:bg-[#101114]">
       <section className="relative w-full h-[200px] sm:h-[260px] md:h-[320px] lg:h-[400px] overflow-hidden">
         {featuredSlides.map((s, index) => (
           <div
@@ -308,22 +308,22 @@ export default function HomePage() {
         <ContentRow title={t("home.row.comedy")} events={comedyEvents} />
       </div>
 
-      <footer className="border-t border-white/10 mt-8">
+      <footer className="mt-8 border-t border-gray-200 dark:border-white/10">
         <div className="max-w-7xl mx-auto px-4 py-6 md:py-8 text-center">
-          <p className="text-xs text-white/80 leading-5">
+          <p className="text-xs leading-5 text-gray-600 dark:text-white/80">
             {t("home.disclaimer")}
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mt-4 text-xs font-bold text-white/80">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mt-4 text-xs font-bold text-gray-700 dark:text-white/80">
             <span>{t("home.about")}</span>
-            <Link href="/events" className="hover:text-white transition-colors">{t("home.browseEvents")}</Link>
-            <span className="h-3 w-px bg-white/30 hidden sm:block" />
-            <Link href="/register" className="hover:text-white transition-colors">{t("home.createAccount")}</Link>
-            <span className="h-3 w-px bg-white/30 hidden sm:block" />
-            <Link href="/privacy" className="hover:text-white transition-colors">{t("home.privacy")}</Link>
-            <span className="h-3 w-px bg-white/30 hidden sm:block" />
-            <Link href="/user-agreement" className="hover:text-white transition-colors">{t("home.agreement")}</Link>
-            <span className="h-3 w-px bg-white/30 hidden sm:block" />
-            <Link href="/contact-us" className="hover:text-white transition-colors">{t("home.contact")}</Link>
+            <Link href="/events" className="transition-colors hover:text-[#B8942E] dark:hover:text-white">{t("home.browseEvents")}</Link>
+            <span className="h-3 w-px bg-gray-300 hidden sm:block dark:bg-white/30" />
+            <Link href="/register" className="transition-colors hover:text-[#B8942E] dark:hover:text-white">{t("home.createAccount")}</Link>
+            <span className="h-3 w-px bg-gray-300 hidden sm:block dark:bg-white/30" />
+            <Link href="/privacy" className="transition-colors hover:text-[#B8942E] dark:hover:text-white">{t("home.privacy")}</Link>
+            <span className="h-3 w-px bg-gray-300 hidden sm:block dark:bg-white/30" />
+            <Link href="/user-agreement" className="transition-colors hover:text-[#B8942E] dark:hover:text-white">{t("home.agreement")}</Link>
+            <span className="h-3 w-px bg-gray-300 hidden sm:block dark:bg-white/30" />
+            <Link href="/contact-us" className="transition-colors hover:text-[#B8942E] dark:hover:text-white">{t("home.contact")}</Link>
           </div>
         </div>
       </footer>
