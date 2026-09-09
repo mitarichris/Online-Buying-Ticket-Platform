@@ -69,5 +69,5 @@
     </g>
   </g>
 
-  <text x="170" y="99" textLength="272" lengthAdjust="spacingAndGlyphs" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="46" font-weight="800" letter-spacing="2" fill="url(#grad)">TICKETHUB</text>
+  <text x="170" y="99" textLength="272" lengthAdjust="spacingAndGlyphs" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="46" font-weight="800" letter-spacing="1" fill="url(#grad)">TicketHub</text>
 </svg>
