@@ -328,14 +328,14 @@ export default function CheckoutPage() {
                             maxLength={4}
                             value={ussdPin}
                             onChange={(e) => setUssdPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                            className={`w-full bg-green-800/50 border border-green-600 rounded px-3 py-2 text-green-200 text-center text-lg tracking-widest outline-none focus:border-green-400 placeholder:text-green-700`}
+                            className={`w-full bg-[#16233b]/70 border border-[#D4AF37]/60 rounded px-3 py-2 text-[#E7C65B] text-center text-lg tracking-widest outline-none focus:border-[#E7C65B] placeholder:text-[#B8942E]`}
                             placeholder={t("checkout.pinPlaceholder")}
                             autoFocus
                           />
                         </div>
-                        <div className="mt-3 text-center text-xs text-green-500">
+                        <div className="mt-3 text-center text-xs text-[#D4AF37]">
                           {ussdPin.length > 0 ? (
-                            <span className="text-green-300">{t("checkout.pressSend")}</span>
+                            <span className="text-[#E7C65B]">{t("checkout.pressSend")}</span>
                           ) : (
                             t("checkout.enter4Pin")
                           )}
@@ -343,7 +343,7 @@ export default function CheckoutPage() {
                         <button
                           type="submit"
                           disabled={ussdPin.length < 4}
-                          className="mt-3 w-full rounded bg-green-600 py-2 text-sm font-semibold text-white disabled:opacity-40 hover:bg-green-500 transition-colors"
+                          className="mt-3 w-full rounded bg-[#D4AF37] py-2 text-sm font-semibold text-[#0F172A] disabled:opacity-40 hover:bg-[#B8942E] transition-colors"
                         >
                           {t("checkout.send")}
                         </button>
@@ -352,19 +352,19 @@ export default function CheckoutPage() {
                   )}
                   {ussdStep === "processing" && (
                     <div className="flex flex-col items-center justify-center flex-1">
-                      <div className="mb-4 h-8 w-8 animate-spin rounded-full border-2 border-green-400 border-t-transparent" />
-                      <p className="text-green-400">{t("checkout.processing")}</p>
-                      <p className="mt-1 text-xs text-green-600">{t("checkout.wait")}</p>
+                      <div className="mb-4 h-8 w-8 animate-spin rounded-full border-2 border-[#D4AF37] border-t-transparent" />
+                      <p className="text-[#D4AF37]">{t("checkout.processing")}</p>
+                      <p className="mt-1 text-xs text-[#B8942E]">{t("checkout.wait")}</p>
                     </div>
                   )}
                   {ussdStep === "done" && (
                     <div className="flex flex-col items-center justify-center flex-1">
-                      <div className="mb-2 text-2xl text-green-400">&#10003;</div>
-                      <p className="text-green-300">{t("checkout.approved")}</p>
-                      <p className="mt-1 text-xs text-green-600">{t("checkout.confirming")}</p>
+                      <div className="mb-2 text-2xl text-[#D4AF37]">&#10003;</div>
+                      <p className="text-[#E7C65B]">{t("checkout.approved")}</p>
+                      <p className="mt-1 text-xs text-[#B8942E]">{t("checkout.confirming")}</p>
                     </div>
                   )}
-                  <div className="mt-auto border-t border-green-800 pt-2 text-xs text-green-600 text-center">
+                  <div className="mt-auto border-t border-[#D4AF37]/40 pt-2 text-xs text-[#B8942E] text-center">
                     {p.footer}
                   </div>
                 </div>
@@ -394,7 +394,7 @@ export default function CheckoutPage() {
 
           {paymentState === "success" && (
             <div className="py-8 text-center">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-600">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#D4AF37]/15 text-[#B8942E]">
                 <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>

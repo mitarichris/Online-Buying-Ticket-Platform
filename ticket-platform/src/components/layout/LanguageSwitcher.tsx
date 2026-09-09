@@ -44,7 +44,7 @@ export function LanguageSwitcher() {
               className="flex w-full items-center justify-between px-3 py-2 text-left text-sm text-white/80 transition hover:bg-white/10"
             >
               <span>{l.native}</span>
-              {l.code === locale && <Check className="h-4 w-4 text-[#1dd171]" />}
+              {l.code === locale && <Check className="h-4 w-4 text-[#D4AF37]" />}
             </button>
           ))}
         </div>

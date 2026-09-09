@@ -12,8 +12,8 @@ export default function ContactPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">
       <div className="mb-8 text-center">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600/10">
-          <MessageCircle className="h-7 w-7 text-indigo-600" />
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#D4AF37]/15">
+          <MessageCircle className="h-7 w-7 text-[#B8942E]" />
         </div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{t("contact.title")}</h1>
         <p className="mt-2 text-gray-500 dark:text-gray-400">{t("contact.subtitle")}</p>
@@ -27,8 +27,8 @@ export default function ContactPage() {
         <div className="space-y-4">
           <div className="flex flex-col gap-3 rounded-xl border border-gray-200 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-gray-700">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-indigo-600/10">
-                <Mail className="h-5 w-5 text-indigo-600" />
+              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#D4AF37]/15">
+                <Mail className="h-5 w-5 text-[#B8942E]" />
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{t("contact.email")}</p>
@@ -37,7 +37,7 @@ export default function ContactPage() {
             </div>
             <a
               href={`mailto:${email}`}
-              className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
+              className="inline-flex items-center justify-center rounded-lg bg-[#D4AF37] px-4 py-2 text-sm font-semibold text-[#0F172A] transition hover:bg-[#B8942E]"
             >
               {t("contact.mailto")}
             </a>
@@ -45,8 +45,8 @@ export default function ContactPage() {
 
           <div className="flex flex-col gap-3 rounded-xl border border-gray-200 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-gray-700">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-indigo-600/10">
-                <Phone className="h-5 w-5 text-indigo-600" />
+              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#D4AF37]/15">
+                <Phone className="h-5 w-5 text-[#B8942E]" />
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{t("contact.phone")}</p>
@@ -55,7 +55,7 @@ export default function ContactPage() {
             </div>
             <a
               href={`tel:${phone.replace(/\s/g, "")}`}
-              className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
+              className="inline-flex items-center justify-center rounded-lg bg-[#D4AF37] px-4 py-2 text-sm font-semibold text-[#0F172A] transition hover:bg-[#B8942E]"
             >
               {t("contact.call")}
             </a>

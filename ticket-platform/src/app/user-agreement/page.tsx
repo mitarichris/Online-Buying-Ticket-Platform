@@ -20,8 +20,8 @@ export default function UserAgreementPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
       <div className="mb-8 flex items-center gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-indigo-600/10">
-          <FileText className="h-6 w-6 text-indigo-600" />
+        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D4AF37]/15">
+          <FileText className="h-6 w-6 text-[#B8942E]" />
         </div>
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{t("legal.terms.title")}</h1>

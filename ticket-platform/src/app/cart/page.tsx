@@ -49,16 +49,16 @@ export default function CartPage() {
                 {item.eventImage ? (
                   <Image src={item.eventImage} alt={item.eventTitle} fill className="object-cover" />
                 ) : (
-                  <div className="h-full w-full bg-gradient-to-br from-indigo-500 to-purple-600" />
+                  <div className="h-full w-full bg-gradient-to-br from-[#0F172A] to-[#D4AF37]" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <Link href={`/events/${item.eventId}`} className="font-semibold text-gray-900 dark:text-white hover:text-indigo-600">
+                <Link href={`/events/${item.eventId}`} className="font-semibold text-gray-900 dark:text-white hover:text-[#B8942E]">
                   {item.eventTitle}
                 </Link>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{formatDate(item.eventDate)}</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{item.ticketTypeName}</p>
-                <p className="mt-1 font-medium text-indigo-600">{t("cart.each", { price: formatCurrency(item.price) })}</p>
+                <p className="mt-1 font-medium text-[#B8942E]">{t("cart.each", { price: formatCurrency(item.price) })}</p>
               </div>
               <div className="flex items-center gap-2 sm:ml-auto">
                 <Button variant="outline" size="sm" onClick={() => updateQuantity(item.eventId, item.ticketTypeId, item.quantity - 1)}>
@@ -104,7 +104,7 @@ export default function CartPage() {
             </Button>
           </Link>
           <div className="mt-3 text-center">
-            <Link href="/events" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+            <Link href="/events" className="text-sm font-medium text-[#B8942E] hover:text-[#926F1E]">
               {t("cart.continue")}
             </Link>
           </div>

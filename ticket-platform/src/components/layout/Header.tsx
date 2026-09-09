@@ -105,7 +105,7 @@ export function Header() {
                     <Button variant="outline" size="sm" className="w-full">{t("nav.signin")}</Button>
                   </Link>
                   <Link href="/register" onClick={() => setMenuOpen(false)}>
-                    <Button size="sm" className="w-full bg-[#1dd171] text-[#062b17] hover:bg-[#17b862]">
+                    <Button size="sm" className="w-full bg-[#D4AF37] text-[#0F172A] hover:bg-[#B8942E]">
                       {t("nav.signup")}
                     </Button>
                   </Link>

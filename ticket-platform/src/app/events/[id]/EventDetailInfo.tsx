@@ -14,21 +14,21 @@ export function EventDetailInfo({ event }: { event: Event }) {
     <>
       <div className="mb-8 grid gap-4 sm:grid-cols-3">
         <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4">
-          <Calendar className="h-5 w-5 text-indigo-600" />
+          <Calendar className="h-5 w-5 text-[#B8942E]" />
           <div>
             <p className="text-sm text-gray-500">{t("event.date")}</p>
             <p className="font-medium">{formatDate(event.date)}</p>
           </div>
         </div>
         <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4">
-          <Clock className="h-5 w-5 text-indigo-600" />
+          <Clock className="h-5 w-5 text-[#B8942E]" />
           <div>
             <p className="text-sm text-gray-500">{t("event.time")}</p>
             <p className="font-medium">{event.time}</p>
           </div>
         </div>
         <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4">
-          <MapPin className="h-5 w-5 text-indigo-600" />
+          <MapPin className="h-5 w-5 text-[#B8942E]" />
           <div>
             <p className="text-sm text-gray-500">{t("event.venue")}</p>
             <p className="font-medium">{event.venue}</p>

@@ -99,7 +99,7 @@ export default function NotificationsPage() {
                   <div className="flex items-start gap-3">
                     <div
                       className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${
-                        n.read ? "bg-gray-300 dark:bg-gray-600" : "bg-indigo-500"
+                        n.read ? "bg-gray-300 dark:bg-gray-600" : "bg-[#D4AF37]"
                       }`}
                     />
                     <div>

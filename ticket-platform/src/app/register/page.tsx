@@ -64,7 +64,7 @@ export default function RegisterPage() {
           </form>
           <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
             {t("register.haveAccount")}{" "}
-            <Link href="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+            <Link href="/login" className="font-medium text-[#B8942E] hover:text-[#926F1E]">
               {t("register.signin")}
             </Link>
           </p>

@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 160">
   <defs>
     <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#22d37b"/>
-      <stop offset="1" stop-color="#0ea35e"/>
+      <stop offset="0" stop-color="#E7C65B"/>
+      <stop offset="1" stop-color="#B8942E"/>
     </linearGradient>
     <linearGradient id="bodyTop" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#ffffff"/>
@@ -10,9 +10,9 @@
       <stop offset="1" stop-color="#e4e9e7"/>
     </linearGradient>
     <linearGradient id="bandG" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#1ed974"/>
-      <stop offset="0.5" stop-color="#12bd62"/>
-      <stop offset="1" stop-color="#0a9550"/>
+      <stop offset="0" stop-color="#16233b"/>
+      <stop offset="0.5" stop-color="#0F172A"/>
+      <stop offset="1" stop-color="#0A101D"/>
     </linearGradient>
     <radialGradient id="sheen" cx="0.35" cy="0.25" r="0.9">
       <stop offset="0" stop-color="#ffffff" stop-opacity="0.55"/>
@@ -21,7 +21,7 @@
     <filter id="soft" x="-30%" y="-40%" width="170%" height="200%">
       <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
       <feOffset dx="1" dy="3" result="off"/>
-      <feFlood flood-color="#0b3a21" flood-opacity="0.35"/>
+      <feFlood flood-color="#0A101D" flood-opacity="0.35"/>
       <feComposite in2="off" operator="in"/>
     </filter>
     <filter id="grain">
@@ -30,10 +30,10 @@
     </filter>
   </defs>
 
-  <circle cx="330" cy="80" r="6" fill="#0a7a45" opacity="0.25"/>
+  <circle cx="330" cy="80" r="6" fill="#B8942E" opacity="0.25"/>
 
   <g transform="rotate(-3 82 80)">
-    <rect x="20" y="34" width="124" height="92" rx="9" fill="#0b3a21" filter="url(#soft)"/>
+    <rect x="20" y="34" width="124" height="92" rx="9" fill="#0A101D" filter="url(#soft)"/>
     <rect x="20" y="34" width="124" height="92" rx="9" fill="url(#bodyTop)"/>
     <rect x="20" y="34" width="124" height="92" rx="9" opacity="0.5" filter="url(#shadow)" fill="none" stroke="#b9c4c0" stroke-width="1"/>
 
@@ -47,7 +47,7 @@
     <path d="M60 130a14 14 0 0 0 27 0" fill="#f7f9f8"/>
     <path d="M61 126h-1" stroke="#c8cecb" stroke-width="1" opacity="0"/>
 
-    <rect x="86" y="42" width="50" height="8" rx="2" fill="#1c2529"/>
+    <rect x="86" y="42" width="50" height="8" rx="2" fill="#0F172A"/>
     <rect x="86" y="56" width="40" height="5" rx="1.5" fill="#aab3b8"/>
     <rect x="86" y="67" width="46" height="5" rx="1.5" fill="#c2c9cc"/>
     <rect x="86" y="78" width="30" height="5" rx="1.5" fill="#c2c9cc"/>

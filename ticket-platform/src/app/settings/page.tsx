@@ -34,7 +34,7 @@ function Toggle({
       </span>
       <span
         className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
-          checked ? "bg-indigo-600" : "bg-gray-300 dark:bg-gray-700"
+          checked ? "bg-[#D4AF37]" : "bg-gray-300 dark:bg-gray-700"
         }`}
       >
         <span
@@ -73,7 +73,7 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
-              <Sun className="h-5 w-5 text-indigo-500" />
+              <Sun className="h-5 w-5 text-[#B8942E]" />
               {t("settings.appearance")}
             </h2>
           </CardHeader>
@@ -87,7 +87,7 @@ export default function SettingsPage() {
               </div>
               <div className="flex items-center gap-2">
                 {theme === "dark" ? (
-                  <Moon className="h-5 w-5 text-indigo-400" />
+                  <Moon className="h-5 w-5 text-[#B8942E]" />
                 ) : (
                   <Sun className="h-5 w-5 text-yellow-500" />
                 )}
@@ -109,7 +109,7 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
-              <User className="h-5 w-5 text-indigo-500" />
+              <User className="h-5 w-5 text-[#B8942E]" />
               {t("settings.profile")}
             </h2>
           </CardHeader>
@@ -131,7 +131,7 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
-              <Bell className="h-5 w-5 text-indigo-500" />
+              <Bell className="h-5 w-5 text-[#B8942E]" />
               {t("settings.notifications")}
             </h2>
           </CardHeader>
@@ -169,7 +169,7 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
-              <Shield className="h-5 w-5 text-indigo-500" />
+              <Shield className="h-5 w-5 text-[#B8942E]" />
               {t("settings.security")}
             </h2>
           </CardHeader>
@@ -191,7 +191,7 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
-              <CreditCard className="h-5 w-5 text-indigo-500" />
+              <CreditCard className="h-5 w-5 text-[#B8942E]" />
               {t("settings.payments")}
             </h2>
           </CardHeader>
@@ -213,7 +213,7 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
-              <Languages className="h-5 w-5 text-indigo-500" />
+              <Languages className="h-5 w-5 text-[#B8942E]" />
               {t("settings.preferences")}
             </h2>
           </CardHeader>

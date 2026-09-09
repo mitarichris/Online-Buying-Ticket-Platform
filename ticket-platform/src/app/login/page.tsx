@@ -66,7 +66,7 @@ export default function LoginPage() {
           </form>
           <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
             {t("login.noAccount")}{" "}
-            <Link href="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
+            <Link href="/register" className="font-medium text-[#B8942E] hover:text-[#926F1E]">
               {t("login.signup")}
             </Link>
           </p>

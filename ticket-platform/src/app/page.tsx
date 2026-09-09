@@ -132,7 +132,7 @@ function EventCard({ event }: { event: EventItem }) {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           <div className="absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="flex items-center gap-1 rounded bg-[#1dd171] px-3 py-1.5 text-xs font-semibold text-[#062b17] w-fit">
+            <div className="flex items-center gap-1 rounded bg-[#D4AF37] px-3 py-1.5 text-xs font-semibold text-[#0F172A] w-fit">
               <Ticket className="h-3 w-3" />
               {t("home.bookNow")}
             </div>
@@ -261,7 +261,7 @@ export default function HomePage() {
             </div>
             <Link
               href={`/events?category=${slide.category}`}
-              className="flex items-center gap-2 rounded bg-[#1dd171] px-4 py-2 md:px-5 md:py-2.5 text-xs md:text-sm font-semibold text-[#062b17] hover:bg-[#17b862] transition-colors"
+              className="flex items-center gap-2 rounded bg-[#D4AF37] px-4 py-2 md:px-5 md:py-2.5 text-xs md:text-sm font-semibold text-[#0F172A] hover:bg-[#B8942E] transition-colors"
             >
               <Ticket className="h-4 w-4" />
               {t("home.bookNow")}
@@ -289,7 +289,7 @@ export default function HomePage() {
               onClick={() => goToSlide(index)}
               className={`h-2 rounded-full transition-all duration-300 ${
                 index === currentSlide
-                  ? "w-6 bg-gradient-to-r from-[#2166e5] to-[#1dd171]"
+                  ? "w-6 bg-gradient-to-r from-[#0F172A] to-[#D4AF37]"
                   : "w-2 bg-white/40 hover:bg-white/60"
               }`}
             />
