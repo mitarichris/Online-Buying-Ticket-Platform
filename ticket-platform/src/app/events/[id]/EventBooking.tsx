@@ -15,6 +15,8 @@ export function EventBooking({ event }: { event: Event }) {
   const router = useRouter();
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const addItem = useCartStore((s) => s.addItem);
+  const clearCart = useCartStore((s) => s.clearCart);
+  const items = useCartStore((s) => s.items);
   const { t } = useLanguage();
 
   function handleQuantityChange(ticketTypeId: string, quantity: number) {
@@ -33,22 +35,35 @@ export function EventBooking({ event }: { event: Event }) {
       if (qty > 0) {
         const ticket = event.ticketTypes.find((t) => t.id === ticketId);
         if (ticket) {
-          addItem({
-            eventId: event.id,
-            eventTitle: event.title,
-            eventDate: event.date,
-            eventImage: event.image || "",
-            ticketTypeId: ticket.id,
-            ticketTypeName: ticket.name,
-            price: ticket.price,
-            quantity: qty,
-          });
           addedCount += qty;
         }
       }
     });
 
     if (addedCount > 0) {
+      // Clear cart if items from a different event exist
+      const hasDifferentEvent = items.some((item) => item.eventId !== event.id);
+      if (hasDifferentEvent) {
+        clearCart();
+      }
+      // Add items for current event
+      Object.entries(quantities).forEach(([ticketId, qty]) => {
+        if (qty > 0) {
+          const ticket = event.ticketTypes.find((t) => t.id === ticketId);
+          if (ticket) {
+            addItem({
+              eventId: event.id,
+              eventTitle: event.title,
+              eventDate: event.date,
+              eventImage: event.image || "",
+              ticketTypeId: ticket.id,
+              ticketTypeName: ticket.name,
+              price: ticket.price,
+              quantity: qty,
+            });
+          }
+        }
+      });
       router.push("/checkout");
     } else {
       toast.error(t("event.selectOne"));
