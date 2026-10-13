@@ -61,8 +61,8 @@ async function main() {
       organizer: "TechEvents Inc.",
       image: "/images/tech-summit-2026.jpg",
       ticketTypes: [
-        { id: "tkt_6", name: "Standard Pass", price: 390000, quantity: 2000, available: 800, description: "Full conference access" },
-        { id: "tkt_7", name: "VIP Pass", price: 780000, quantity: 500, available: 150, description: "VIP networking + workshops" },
+        { id: "tkt_6", name: "Standard Pass", price: 100, quantity: 2000, available: 800, description: "Full conference access" },
+        { id: "tkt_7", name: "VIP Pass", price: 100, quantity: 500, available: 150, description: "VIP networking + workshops" },
       ],
     },
     {
