@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -12,30 +12,11 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { useLanguage } from "@/i18n/LanguageProvider";
 
-type PaymentState = "form" | "ussd" | "processing" | "success" | "failed";
-type Provider = "mtn" | "airtel";
+type PaymentState = "form" | "processing" | "success" | "failed";
 
-const PROVIDERS: Record<Provider, { name: string; color: string; bg: string; border: string; text: string; ussdBg: string; ussdAccent: string; footer: string }> = {
-  mtn: {
-    name: "MTN MoMo",
-    color: "#FFCC00",
-    bg: "bg-[#FFCC00]",
-    border: "border-[#FFCC00]",
-    text: "text-[#000000]",
-    ussdBg: "from-yellow-900 to-yellow-950",
-    ussdAccent: "text-yellow-300",
-    footer: "MTN Rwanda",
-  },
-  airtel: {
-    name: "Airtel Money",
-    color: "#ED1C24",
-    bg: "bg-[#ED1C24]",
-    border: "border-[#ED1C24]",
-    text: "text-white",
-    ussdBg: "from-red-900 to-red-950",
-    ussdAccent: "text-red-300",
-    footer: "Airtel Money",
-  },
+const NETWORK_LABELS: Record<string, string> = {
+  mtn: "MTN MoMo",
+  airtel: "Airtel Money",
 };
 
 export default function CheckoutPage() {
@@ -45,16 +26,12 @@ export default function CheckoutPage() {
   const { items, getTotal, clearCart } = useCartStore();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [provider, setProvider] = useState<Provider | null>(null);
   const [paymentState, setPaymentState] = useState<PaymentState>("form");
   const [loading, setLoading] = useState(false);
   const [referenceId, setReferenceId] = useState("");
-  const [orderId, setOrderId] = useState("");
-  const [ussdPin, setUssdPin] = useState("");
-  const [ussdStep, setUssdStep] = useState<"prompt" | "processing" | "done">("prompt");
-  const pinInputRef = useRef<HTMLInputElement>(null);
+  const [network, setNetwork] = useState("");
 
-  const total = getTotal() * 1.05;
+  const total = getTotal();
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -63,18 +40,51 @@ export default function CheckoutPage() {
     }
   }, [status, router, t]);
 
-  useEffect(() => {
-    if (paymentState === "ussd" && ussdStep === "prompt") {
-      setTimeout(() => pinInputRef.current?.focus(), 500);
-    }
-  }, [paymentState, ussdStep]);
+  const pollPaymentStatus = useCallback(
+    async (refId: string) => {
+      const maxAttempts = 30;
+      let attempts = 0;
+
+      const poll = async () => {
+        attempts++;
+        try {
+          const res = await fetch(`/api/payments/${refId}`);
+          if (res.ok) {
+            const { status: txnStatus } = await res.json();
+
+            if (txnStatus === "succeeded") {
+              setPaymentState("success");
+              clearCart();
+              toast.success(t("checkout.paySuccess"));
+              setTimeout(() => router.push("/orders"), 800);
+              return;
+            }
+
+            if (txnStatus === "failed" || txnStatus === "cancelled") {
+              setPaymentState("failed");
+              toast.error(t("checkout.payFailed"));
+              return;
+            }
+          }
+        } catch {
+          // continue polling
+        }
+
+        if (attempts < maxAttempts) {
+          setTimeout(poll, 3000);
+        } else {
+          setPaymentState("failed");
+          toast.error(t("checkout.payTimedOut"));
+        }
+      };
+
+      setTimeout(poll, 1000);
+    },
+    [clearCart, router, t]
+  );
 
   async function handlePay(e: React.FormEvent) {
     e.preventDefault();
-    if (!provider) {
-      toast.error(t("checkout.selectMethod"));
-      return;
-    }
     setLoading(true);
 
     try {
@@ -98,40 +108,28 @@ export default function CheckoutPage() {
       });
 
       if (!orderRes.ok) {
-        const err = await orderRes.text();
-        throw new Error(err);
+        const err = await orderRes.json().catch(() => null);
+        throw new Error(err?.error || t("checkout.somethingWentWrong"));
       }
 
       const order = await orderRes.json();
-      setOrderId(order.id);
 
-      const payRes = await fetch("/api/mtn/request-to-pay", {
+      const payRes = await fetch("/api/payments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: Math.round(total),
-          phoneNumber: phone,
-          orderId: order.id,
-          provider,
-        }),
+        body: JSON.stringify({ orderId: order.id, phoneNumber: phone }),
       });
 
       if (!payRes.ok) {
-        const err = await payRes.text();
-        throw new Error(err);
+        const err = await payRes.json().catch(() => null);
+        throw new Error(err?.error || t("checkout.somethingWentWrong"));
       }
 
       const data = await payRes.json();
-      setReferenceId(data.referenceId);
-
-      if (data.simulation) {
-        setPaymentState("ussd");
-        setUssdStep("prompt");
-        setUssdPin("");
-      } else {
-        setPaymentState("processing");
-        pollPaymentStatus(data.referenceId);
-      }
+      setReferenceId(data.paymentId);
+      setNetwork(data.network || "");
+      setPaymentState("processing");
+      pollPaymentStatus(order.id);
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : t("checkout.somethingWentWrong"));
       setPaymentState("failed");
@@ -140,78 +138,11 @@ export default function CheckoutPage() {
     }
   }
 
-  function handleUssdSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (ussdPin.length < 4) return;
-
-      setUssdStep("processing");
-
-    setTimeout(async () => {
-      await fetch("/api/webhooks/intouch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          requesttransactionid: referenceId,
-          transactionid: referenceId,
-          status: "successful",
-          responsecode: "2001",
-          statusdesc: "Approved",
-        }),
-      });
-
-      setUssdStep("done");
-      setTimeout(() => pollPaymentStatus(referenceId), 300);
-    }, 800);
-  }
-
-  const pollPaymentStatus = useCallback(async (refId: string) => {
-    const maxAttempts = 30;
-    let attempts = 0;
-
-    const poll = async () => {
-      attempts++;
-      try {
-        const res = await fetch(`/api/mtn/status/${refId}`);
-        if (!res.ok) throw new Error("Status check failed");
-
-        const { status: txnStatus } = await res.json();
-
-        if (txnStatus === "SUCCESSFUL") {
-          setPaymentState("success");
-          clearCart();
-          toast.success(t("checkout.paySuccess"));
-          setTimeout(() => router.push("/orders"), 800);
-          return;
-        }
-
-        if (txnStatus === "FAILED") {
-          setPaymentState("failed");
-          toast.error(t("checkout.payFailed"));
-          return;
-        }
-      } catch {
-        // continue polling
-      }
-
-      if (attempts < maxAttempts) {
-        setTimeout(poll, 3000);
-      } else {
-        if (orderId) {
-          await fetch(`/api/orders/${orderId}`, { method: "PATCH" }).catch(() => {});
-        }
-        setPaymentState("failed");
-        toast.error(t("checkout.payTimedOut"));
-      }
-    };
-
-    setTimeout(poll, 400);
-  }, [clearCart, router, orderId, t]);
-
   if (status === "loading") {
     return <div className="mx-auto max-w-2xl px-4 py-8" />;
   }
 
-  if (items.length === 0 && paymentState !== "processing" && paymentState !== "ussd") {
+  if (items.length === 0 && paymentState === "form") {
     return (
       <div className="mx-auto max-w-2xl px-4 py-16 text-center">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("checkout.empty")}</h1>
@@ -221,7 +152,7 @@ export default function CheckoutPage() {
     );
   }
 
-  const p = provider ? PROVIDERS[provider] : null;
+  const networkLabel = NETWORK_LABELS[network] || t("checkout.state.mobile");
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
@@ -247,7 +178,6 @@ export default function CheckoutPage() {
         <CardHeader>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             {paymentState === "form" && t("checkout.state.payment")}
-            {paymentState === "ussd" && (p ? p.name : t("checkout.state.mobile"))}
             {paymentState === "processing" && t("checkout.state.processing")}
             {paymentState === "success" && t("checkout.state.success")}
             {paymentState === "failed" && t("checkout.state.failed")}
@@ -258,25 +188,9 @@ export default function CheckoutPage() {
             <form onSubmit={handlePay} className="space-y-4">
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("checkout.method")}</label>
-                <div className="grid grid-cols-2 gap-3">
-                  {(Object.keys(PROVIDERS) as Provider[]).map((key) => {
-                    const prov = PROVIDERS[key];
-                    const isSelected = provider === key;
-                    return (
-                      <button
-                        key={key}
-                        type="button"
-                        onClick={() => setProvider(key)}
-                        className={`relative flex items-center justify-center gap-2 rounded-lg border-2 px-4 py-3 text-sm font-semibold transition-all ${
-                          isSelected
-                            ? `${prov.border} ${prov.bg} ${prov.text} shadow-md`
-                            : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50"
-                        }`}
-                      >
-                        {prov.name}
-                      </button>
-                    );
-                  })}
+                <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                  <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{t("checkout.state.mobile")}</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">{t("checkout.networks")}</span>
                 </div>
               </div>
 
@@ -296,81 +210,12 @@ export default function CheckoutPage() {
                 required
               />
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {t("checkout.sent", { provider: provider ? PROVIDERS[provider].name : t("checkout.state.mobile") })}
+                {t("checkout.sent", { provider: t("checkout.state.mobile") })}
               </p>
               <Button type="submit" loading={loading} size="lg" className="w-full">
-                {t("checkout.pay", { amount: formatCurrency(total), provider: provider ? PROVIDERS[provider].name : t("checkout.state.mobile") })}
+                {t("checkout.pay", { amount: formatCurrency(total), provider: t("checkout.state.mobile") })}
               </Button>
             </form>
-          )}
-
-          {paymentState === "ussd" && p && (
-            <div className="flex justify-center py-4">
-              <div className="w-full max-w-[288px] overflow-hidden rounded-3xl border-4 border-gray-800 bg-gray-900 shadow-xl">
-                <div className="flex items-center justify-center bg-gray-800 py-3">
-                  <div className="h-3 w-20 rounded-full bg-gray-600" />
-                </div>
-                <div className={`bg-gradient-to-b ${p.ussdBg} p-4 font-mono text-sm min-h-[320px] flex flex-col`}>
-                  {ussdStep === "prompt" && (
-                    <>
-                      <div className={`mb-4 text-center text-xs ${p.ussdAccent}`}>{p.name}</div>
-                      <div className="mb-3 space-y-1 text-gray-300">
-                        <p>{t("checkout.confirm")}</p>
-                        <p>{t("checkout.amount")} <span className={p.ussdAccent}>{formatCurrency(total)}</span></p>
-                        <p>{t("checkout.from", { phone })}</p>
-                        <p className="mt-2">{t("checkout.enterPin")}</p>
-                      </div>
-                      <form onSubmit={handleUssdSubmit} className="mt-auto">
-                        <div className="relative">
-                          <input
-                            ref={pinInputRef}
-                            type="password"
-                            inputMode="numeric"
-                            maxLength={4}
-                            value={ussdPin}
-                            onChange={(e) => setUssdPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                            className={`w-full bg-[#16233b]/70 border border-[#D4AF37]/60 rounded px-3 py-2 text-[#E7C65B] text-center text-lg tracking-widest outline-none focus:border-[#E7C65B] placeholder:text-[#B8942E]`}
-                            placeholder={t("checkout.pinPlaceholder")}
-                            autoFocus
-                          />
-                        </div>
-                        <div className="mt-3 text-center text-xs text-[#D4AF37]">
-                          {ussdPin.length > 0 ? (
-                            <span className="text-[#E7C65B]">{t("checkout.pressSend")}</span>
-                          ) : (
-                            t("checkout.enter4Pin")
-                          )}
-                        </div>
-                        <button
-                          type="submit"
-                          disabled={ussdPin.length < 4}
-                          className="mt-3 w-full rounded bg-blue-600 py-2 text-sm font-semibold text-white disabled:opacity-40 hover:bg-blue-700 transition-colors"
-                        >
-                          {t("checkout.send")}
-                        </button>
-                      </form>
-                    </>
-                  )}
-                  {ussdStep === "processing" && (
-                    <div className="flex flex-col items-center justify-center flex-1">
-                      <div className="mb-4 h-8 w-8 animate-spin rounded-full border-2 border-[#D4AF37] border-t-transparent" />
-                      <p className="text-[#D4AF37]">{t("checkout.processing")}</p>
-                      <p className="mt-1 text-xs text-[#B8942E]">{t("checkout.wait")}</p>
-                    </div>
-                  )}
-                  {ussdStep === "done" && (
-                    <div className="flex flex-col items-center justify-center flex-1">
-                      <div className="mb-2 text-2xl text-[#D4AF37]">&#10003;</div>
-                      <p className="text-[#E7C65B]">{t("checkout.approved")}</p>
-                      <p className="mt-1 text-xs text-[#B8942E]">{t("checkout.confirming")}</p>
-                    </div>
-                  )}
-                  <div className="mt-auto border-t border-[#D4AF37]/40 pt-2 text-xs text-[#B8942E] text-center">
-                    {p.footer}
-                  </div>
-                </div>
-              </div>
-            </div>
           )}
 
           {paymentState === "processing" && (
@@ -382,7 +227,7 @@ export default function CheckoutPage() {
               </div>
               <p className="text-lg font-medium text-gray-900 dark:text-white">{t("checkout.checkPhone")}</p>
               <p className="mt-2 text-gray-600 dark:text-gray-300">
-                {t("checkout.requestSent", { provider: p ? p.name : t("checkout.state.mobile"), phone })}
+                {t("checkout.requestSent", { provider: networkLabel, phone })}
               </p>
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 {t("checkout.openPhone")}
