@@ -37,6 +37,7 @@ export interface CartItem {
 export interface Order {
   id: string;
   userId: string;
+  user?: { name: string };
   items: OrderItem[];
   total: number;
   status: "pending" | "confirmed" | "cancelled" | "refunded";

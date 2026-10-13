@@ -188,6 +188,9 @@ const en: Dict = {
   "orders.status.confirmed": "Confirmed",
   "orders.status.cancelled": "Cancelled",
   "orders.status.refunded": "Refunded",
+  "orders.buyer": "Buyer: {name}",
+  "orders.amountPaid": "Amount Paid",
+  "orders.downloadReceipt": "Download Receipt",
 
   // Notifications
   "notif.title": "Notifications",
@@ -482,6 +485,9 @@ const rw: Dict = {
   "orders.status.confirmed": "Byemejwe",
   "orders.status.cancelled": "Byahagaritswe",
   "orders.status.refunded": "Byasubijwe",
+  "orders.buyer": "Umuguzi: {name}",
+  "orders.amountPaid": "Amafaranga Yishyuwe",
+  "orders.downloadReceipt": "Kurura Rekisiti",
 
   "notif.title": "Amatangazo",
   "notif.markAll": "Andika byose nk'abasomye",
@@ -768,6 +774,9 @@ const fr: Dict = {
   "orders.status.confirmed": "Confirmé",
   "orders.status.cancelled": "Annulé",
   "orders.status.refunded": "Remboursé",
+  "orders.buyer": "Acheteur : {name}",
+  "orders.amountPaid": "Montant payé",
+  "orders.downloadReceipt": "Télécharger le reçu",
 
   "notif.title": "Notifications",
   "notif.markAll": "Tout marquer comme lu",
