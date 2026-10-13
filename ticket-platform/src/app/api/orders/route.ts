@@ -24,7 +24,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { items, total } = await request.json();
+    const { items, total, name } = await request.json();
 
     const order = await prisma.$transaction(
       async (tx) => {
@@ -41,6 +41,7 @@ export async function POST(request: Request) {
         return tx.order.create({
           data: {
             userId: session.user.id,
+            buyerName: name || null,
             total,
             status: "pending",
             paymentStatus: "pending",

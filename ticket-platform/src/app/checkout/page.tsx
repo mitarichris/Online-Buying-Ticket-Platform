@@ -79,6 +79,7 @@ export default function CheckoutPage() {
 
     try {
       const orderPayload = {
+        name,
         items: items.map((i) => ({
           eventId: i.eventId,
           eventTitle: i.eventTitle,

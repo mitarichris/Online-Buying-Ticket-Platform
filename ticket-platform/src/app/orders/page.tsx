@@ -208,6 +208,8 @@ export default function OrdersPage() {
     );
   }
 
+  const getBuyerName = (order: Order) => order.buyerName || order.user?.name || session?.user?.name || "-";
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       <h1 className="mb-8 text-3xl font-bold text-gray-900 dark:text-white">{t("orders.title")}</h1>
@@ -248,7 +250,7 @@ export default function OrdersPage() {
                       )}
                     </div>
                     <div className="mt-2 space-y-1 text-sm text-gray-500 dark:text-gray-400">
-                      <p>{t("orders.buyer", { name: order.user?.name || session?.user?.name || "-" })}</p>
+                      <p>{t("orders.buyer", { name: getBuyerName(order) })}</p>
                       {order.items.map((item, i) => (
                         <p key={i}>{item.eventTitle} - {item.ticketTypeName} x {item.quantity}</p>
                       ))}
@@ -267,7 +269,7 @@ export default function OrdersPage() {
                       {order.status === "confirmed" && (
                         <Button
                           variant="outline"
-                          onClick={() => downloadReceipt(order, order.user?.name || session?.user?.name || "-")}
+                          onClick={() => downloadReceipt(order, getBuyerName(order))}
                         >
                           <Download className="mr-2 h-4 w-4" />
                           {t("orders.downloadReceipt")}
