@@ -13,11 +13,24 @@ import Link from "next/link";
 import { useLanguage } from "@/i18n/LanguageProvider";
 
 type PaymentState = "form" | "processing" | "success" | "failed";
+type Provider = "mtn" | "airtel";
+
+const PROVIDERS: Record<Provider, { name: string; bg: string; border: string; text: string }> = {
+  mtn: { name: "MTN MoMo", bg: "bg-[#FFCC00]", border: "border-[#FFCC00]", text: "text-[#000000]" },
+  airtel: { name: "Airtel Money", bg: "bg-[#ED1C24]", border: "border-[#ED1C24]", text: "text-white" },
+};
 
 const NETWORK_LABELS: Record<string, string> = {
   mtn: "MTN MoMo",
   airtel: "Airtel Money",
 };
+
+function detectNetwork(phone: string): Provider | null {
+  const clean = phone.replace(/[^0-9]/g, "").replace(/^250/, "").replace(/^0/, "");
+  if (clean.startsWith("78") || clean.startsWith("79")) return "mtn";
+  if (clean.startsWith("72") || clean.startsWith("73")) return "airtel";
+  return null;
+}
 
 export default function CheckoutPage() {
   const { status } = useSession();
@@ -30,6 +43,7 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [referenceId, setReferenceId] = useState("");
   const [network, setNetwork] = useState("");
+  const [provider, setProvider] = useState<Provider | null>(null);
 
   const total = getTotal();
 
@@ -85,6 +99,15 @@ export default function CheckoutPage() {
 
   async function handlePay(e: React.FormEvent) {
     e.preventDefault();
+    if (!provider) {
+      toast.error(t("checkout.selectMethod"));
+      return;
+    }
+    const detectedNow = detectNetwork(phone);
+    if (detectedNow && detectedNow !== provider) {
+      toast.error(t("checkout.networkMismatch", { detected: PROVIDERS[detectedNow].name }));
+      return;
+    }
     setLoading(true);
 
     try {
@@ -152,7 +175,10 @@ export default function CheckoutPage() {
     );
   }
 
-  const networkLabel = NETWORK_LABELS[network] || t("checkout.state.mobile");
+  const detected = detectNetwork(phone);
+  const detectedName = detected ? PROVIDERS[detected].name : "";
+  const mismatch = !!provider && !!detected && detected !== provider;
+  const networkLabel = NETWORK_LABELS[network] || (provider ? PROVIDERS[provider].name : t("checkout.state.mobile"));
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
@@ -188,9 +214,25 @@ export default function CheckoutPage() {
             <form onSubmit={handlePay} className="space-y-4">
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("checkout.method")}</label>
-                <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
-                  <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{t("checkout.state.mobile")}</span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">{t("checkout.networks")}</span>
+                <div className="grid grid-cols-2 gap-3">
+                  {(Object.keys(PROVIDERS) as Provider[]).map((key) => {
+                    const prov = PROVIDERS[key];
+                    const isSelected = provider === key;
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => setProvider(key)}
+                        className={`rounded-lg border-2 px-4 py-3 text-sm font-semibold transition-all ${
+                          isSelected
+                            ? `${prov.border} ${prov.bg} ${prov.text} shadow-md`
+                            : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50"
+                        }`}
+                      >
+                        {prov.name}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -209,11 +251,16 @@ export default function CheckoutPage() {
                 onChange={(e) => setPhone(e.target.value)}
                 required
               />
+              {mismatch && (
+                <p className="text-sm text-red-600 dark:text-red-400">
+                  {t("checkout.networkMismatch", { detected: detectedName })}
+                </p>
+              )}
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {t("checkout.sent", { provider: t("checkout.state.mobile") })}
+                {t("checkout.sent", { provider: provider ? PROVIDERS[provider].name : t("checkout.state.mobile") })}
               </p>
-              <Button type="submit" loading={loading} size="lg" className="w-full">
-                {t("checkout.pay", { amount: formatCurrency(total), provider: t("checkout.state.mobile") })}
+              <Button type="submit" loading={loading} disabled={mismatch} size="lg" className="w-full">
+                {t("checkout.pay", { amount: formatCurrency(total), provider: provider ? PROVIDERS[provider].name : t("checkout.state.mobile") })}
               </Button>
             </form>
           )}
