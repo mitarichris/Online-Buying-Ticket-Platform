@@ -21,16 +21,25 @@ function downloadReceipt(order: Order, buyerName: string) {
   const provider = PROVIDER_LABELS[order.paymentProvider ?? ""] || order.paymentProvider || "";
   const rows = order.items
     .map(
-      (item) => `
-        <tr>
-          <td style="padding:8px;border-bottom:1px solid #eee">${item.eventTitle}</td>
-          <td style="padding:8px;border-bottom:1px solid #eee">${item.ticketTypeName}</td>
-          <td style="padding:8px;border-bottom:1px solid #eee;text-align:center">${item.quantity}</td>
-          <td style="padding:8px;border-bottom:1px solid #eee;text-align:right">${formatCurrency(item.unitPrice)}</td>
-          <td style="padding:8px;border-bottom:1px solid #eee;text-align:right">${formatCurrency(item.unitPrice * item.quantity)}</td>
+      (item, i) => `
+        <tr style="background:${i % 2 === 0 ? "#ffffff" : "#f8fafc"}">
+          <td style="padding:12px;border-bottom:1px solid #eef2f7;color:#0f172a">${item.eventTitle}</td>
+          <td style="padding:12px;border-bottom:1px solid #eef2f7;color:#475569">${item.ticketTypeName}</td>
+          <td style="padding:12px;border-bottom:1px solid #eef2f7;text-align:center;color:#475569">${item.quantity}</td>
+          <td style="padding:12px;border-bottom:1px solid #eef2f7;text-align:right;color:#475569">${formatCurrency(item.unitPrice)}</td>
+          <td style="padding:12px;border-bottom:1px solid #eef2f7;text-align:right;color:#0f172a;font-weight:600">${formatCurrency(item.unitPrice * item.quantity)}</td>
         </tr>`
     )
     .join("");
+
+  const statusPill =
+    order.status === "confirmed"
+      ? { bg: "#ecfdf5", color: "#059669", label: "Confirmed" }
+      : order.status === "pending"
+      ? { bg: "#fffbeb", color: "#d97706", label: "Awaiting Payment" }
+      : order.status === "cancelled"
+      ? { bg: "#fef2f2", color: "#dc2626", label: "Cancelled" }
+      : { bg: "#eef2ff", color: "#4f46e5", label: "Refunded" };
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -38,41 +47,109 @@ function downloadReceipt(order: Order, buyerName: string) {
   <meta charset="utf-8" />
   <title>Receipt - ${order.id.slice(0, 8)}</title>
   <style>
-    body { font-family: Arial, Helvetica, sans-serif; color: #111; margin: 0; padding: 32px; }
-    .receipt { max-width: 640px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px; padding: 32px; }
-    h1 { margin: 0; font-size: 22px; }
-    .meta { color: #555; margin-bottom: 24px; }
-    .meta p { margin: 2px 0; }
-    table { width: 100%; border-collapse: collapse; margin: 16px 0; }
-    th { text-align: left; padding: 8px; background: #f5f5f5; border-bottom: 2px solid #ddd; }
-    .total { text-align: right; font-size: 18px; font-weight: bold; margin-top: 16px; }
-    .footer { margin-top: 24px; color: #777; font-size: 13px; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 40px 16px; background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 40%, #fefce8 100%); font-family: "Segoe UI", Arial, Helvetica, sans-serif; color: #0f172a; }
+    .page { max-width: 680px; margin: 0 auto; background: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.25); }
+    .header { background: linear-gradient(120deg, #0f172a 0%, #1e3a8a 60%, #2563eb 100%); color: #ffffff; padding: 40px 40px 28px; position: relative; overflow: hidden; }
+    .header::before { content: ""; position: absolute; top: -60px; right: -60px; width: 200px; height: 200px; border-radius: 50%; background: rgba(250, 204, 21, 0.18); }
+    .header::after { content: ""; position: absolute; bottom: -80px; left: 30%; width: 160px; height: 160px; border-radius: 50%; background: rgba(37, 99, 235, 0.25); }
+    .brand { display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
+    .brand-icon { width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #facc15, #f59e0b); display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 6px 16px rgba(250, 204, 21, 0.4); }
+    .brand-name { font-size: 26px; font-weight: 800; letter-spacing: 0.5px; }
+    .brand-name span { color: #facc15; }
+    .header-sub { font-size: 13px; letter-spacing: 4px; text-transform: uppercase; color: #93c5fd; margin-top: 2px; position: relative; z-index: 1; }
+    .gold-bar { height: 6px; background: linear-gradient(90deg, #facc15, #f59e0b, #facc15); }
+    .body { padding: 28px 40px 32px; }
+    .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    .meta-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #94a3b8; }
+    .meta-value { font-size: 15px; font-weight: 600; color: #0f172a; margin-top: 3px; }
+    .pill { display: inline-block; padding: 5px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; }
+    .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #64748b; margin: 28px 0 12px; }
+    table { width: 100%; border-collapse: collapse; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06); }
+    thead th { background: linear-gradient(90deg, #1e3a8a, #2563eb); color: #ffffff; text-align: left; padding: 12px 14px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+    tbody td { font-size: 14px; }
+    .total-row { background: linear-gradient(120deg, #0f172a, #1e3a8a); border-radius: 14px; margin-top: 20px; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; color: #ffffff; }
+    .total-label { font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: #93c5fd; }
+    .total-amount { font-size: 28px; font-weight: 800; color: #facc15; margin-top: 2px; }
+    .barcode-zone { display: flex; align-items: center; justify-content: center; margin-top: 26px; }
+    .barcode { font-family: "Courier New", monospace; font-size: 15px; letter-spacing: 2px; color: #0f172a; padding: 10px 18px; background: #f1f5f9; border: 1px dashed #cbd5e1; border-radius: 10px; }
+    .footer { padding: 22px 40px 30px; text-align: center; border-top: 2px dashed #e2e8f0; position: relative; }
+    .footer::before, .footer::after { content: ""; position: absolute; top: -11px; width: 22px; height: 22px; border-radius: 50%; background: #f8fafc; }
+    .footer::before { left: -11px; }
+    .footer::after { right: -11px; }
+    .footer-thanks { font-size: 15px; font-weight: 700; color: #1e3a8a; }
+    .footer-note { font-size: 12px; color: #94a3b8; margin-top: 6px; }
+    .footer-brand { font-size: 11px; font-weight: 700; letter-spacing: 3px; color: #2563eb; margin-top: 14px; text-transform: uppercase; }
   </style>
 </head>
 <body>
-  <div class="receipt">
-    <h1>TicketHub - Payment Receipt</h1>
-    <div class="meta">
-      <p><strong>Order:</strong> ${order.id}</p>
-      <p><strong>Date:</strong> ${new Date(order.createdAt).toLocaleString()}</p>
-      <p><strong>Customer:</strong> ${buyerName}</p>
-      ${provider ? `<p><strong>Payment Method:</strong> ${provider}</p>` : ""}
-      <p><strong>Status:</strong> ${order.status}</p>
+  <div class="page">
+    <div class="header">
+      <div class="brand">
+        <div class="brand-icon">&#127915;</div>
+        <div>
+          <div class="brand-name">Ticket<span>Hub</span></div>
+          <div class="header-sub">Payment Receipt</div>
+        </div>
+      </div>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th>Event</th>
-          <th>Ticket Type</th>
-          <th style="text-align:center">Qty</th>
-          <th style="text-align:right">Unit Price</th>
-          <th style="text-align:right">Total</th>
-        </tr>
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>
-    <p class="total">Amount Paid: ${formatCurrency(order.total)}</p>
-    <p class="footer">Thank you for using TicketHub!</p>
+    <div class="gold-bar"></div>
+    <div class="body">
+      <div class="meta">
+        <div>
+          <div class="meta-label">Order</div>
+          <div class="meta-value">#${order.id.slice(0, 8)}</div>
+        </div>
+        <div>
+          <div class="meta-label">Customer</div>
+          <div class="meta-value">${buyerName}</div>
+        </div>
+        <div>
+          <div class="meta-label">Date</div>
+          <div class="meta-value">${new Date(order.createdAt).toLocaleString()}</div>
+        </div>
+        <div>
+          <div class="meta-label">Status</div>
+          <div class="meta-value"><span class="pill" style="background:${statusPill.bg};color:${statusPill.color}">${statusPill.label}</span></div>
+        </div>
+        ${provider ? `<div>
+          <div class="meta-label">Payment Method</div>
+          <div class="meta-value">${provider}</div>
+        </div>` : ""}
+      </div>
+
+      <div class="section-title">Ticket Summary</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Event</th>
+            <th>Ticket Type</th>
+            <th style="text-align:center">Qty</th>
+            <th style="text-align:right">Unit Price</th>
+            <th style="text-align:right">Total</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+
+      <div class="total-row">
+        <div>
+          <div class="total-label">Total Paid</div>
+          <div class="total-amount">${formatCurrency(order.total)}</div>
+        </div>
+        <div style="font-size:40px">&#129534;</div>
+      </div>
+
+      <div class="barcode-zone">
+        <div class="barcode">&#9616;&nbsp;&#9616;&nbsp;&#9608;&#9600;&#9608;&#9600;&#9608;&#9608;&#9600;&#9608;&nbsp;${order.id.replace(/-/g, "").slice(0, 12)}&#9616;&#9600;&#9608;&#9600;&#9608;&#9608;&#9600;&#9608;&#9608;</div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-thanks">Thank you for using TicketHub!</div>
+      <div class="footer-note">This receipt confirms your ticket purchase. Please keep it for your records.</div>
+      <div class="footer-brand">TicketHub &bull; Book. Pay. Enjoy.</div>
+    </div>
   </div>
 </body>
 </html>`;
