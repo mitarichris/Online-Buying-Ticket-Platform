@@ -48,6 +48,39 @@ function Toggle({
   );
 }
 
+function PaymentMethodRow({
+  name,
+  badge,
+  badgeClassName,
+  subtitle,
+  availableLabel,
+}: {
+  name: string;
+  badge: string;
+  badgeClassName: string;
+  subtitle: string;
+  availableLabel: string;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4 rounded-lg border border-gray-200 p-3 dark:border-gray-800">
+      <div className="flex items-center gap-3">
+        <span
+          className={`flex h-10 w-10 items-center justify-center rounded-full text-[10px] font-bold ${badgeClassName}`}
+        >
+          {badge}
+        </span>
+        <div>
+          <p className="text-sm font-medium text-gray-900 dark:text-white">{name}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{subtitle}</p>
+        </div>
+      </div>
+      <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200">
+        {availableLabel}
+      </span>
+    </div>
+  );
+}
+
 export default function SettingsPage() {
   const { t } = useLanguage();
   const { data: session, status } = useSession();
@@ -192,16 +225,25 @@ export default function SettingsPage() {
               <CreditCard className="h-5 w-5 text-[#B8942E]" />
               {t("settings.payments")}
             </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {t("settings.paymentMethodsHint")}
+            </p>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => toast.info(t("settings.paymentsSoon"))}
-            >
-              <CreditCard className="mr-2 h-4 w-4" />
-              {t("settings.managePayments")}
-            </Button>
+            <PaymentMethodRow
+              name="MTN MoMo"
+              badge="MTN"
+              badgeClassName="bg-[#FFCC00] text-black"
+              subtitle={t("settings.mobileMoney")}
+              availableLabel={t("settings.available")}
+            />
+            <PaymentMethodRow
+              name="Airtel Money"
+              badge="Airtel"
+              badgeClassName="bg-[#ED1C24] text-white"
+              subtitle={t("settings.mobileMoney")}
+              availableLabel={t("settings.available")}
+            />
             <p className="text-xs text-gray-400 dark:text-gray-500">
               {t("settings.managePaymentsHint")}
             </p>
