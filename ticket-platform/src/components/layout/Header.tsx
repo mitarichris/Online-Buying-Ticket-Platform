@@ -118,6 +118,7 @@ export function Header() {
               )}
 
               <SectionLabel>{t("nav.help")}</SectionLabel>
+              <MenuLink href="/guide" onClick={() => setMenuOpen(false)}>{t("nav.guide")}</MenuLink>
               <MenuLink href="/contact-us" onClick={() => setMenuOpen(false)}>{t("home.contact")}</MenuLink>
               <MenuLink href="/privacy" onClick={() => setMenuOpen(false)}>{t("home.privacy")}</MenuLink>
               <MenuLink href="/user-agreement" onClick={() => setMenuOpen(false)}>{t("home.agreement")}</MenuLink>
