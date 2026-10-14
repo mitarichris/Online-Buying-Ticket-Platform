@@ -65,8 +65,8 @@ export default function ContactPage() {
 
           <div className="flex flex-col gap-3 rounded-xl border border-gray-200 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-gray-700">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#25D366]/15">
-                <MessageCircle className="h-5 w-5 text-[#25D366]" />
+              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#D4AF37]/15">
+                <MessageCircle className="h-5 w-5 text-[#B8942E]" />
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{t("contact.whatsapp")}</p>
@@ -77,7 +77,7 @@ export default function ContactPage() {
               href={whatsappLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-lg bg-[#25D366] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#1EBE5B]"
+              className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
             >
               {t("contact.chat")}
             </a>
