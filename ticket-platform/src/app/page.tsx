@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { ChevronLeft, ChevronRight, Ticket } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageProvider";
 
@@ -58,6 +58,7 @@ interface EventItem {
   date: string;
   genre: string;
   slug: string;
+  category?: string;
 }
 
 const popularEvents: EventItem[] = [
@@ -114,6 +115,95 @@ const moviesEvents: EventItem[] = [
   { id: "evt_14", title: "Moana", image: "/images/moana.jpg", date: "Dec 4, 2026", genre: "Adventure", slug: "" },
   { id: "evt_15", title: "Star Wars: The Mandalorian and Grogu", image: "/images/mandalorian-and-grogu.jpg", date: "Dec 11, 2026", genre: "Sci-Fi", slug: "" },
 ];
+
+interface ApiEvent {
+  id: string;
+  title: string;
+  category: string;
+  date: string;
+  genre?: string | null;
+  image?: string | null;
+}
+
+const MONTHS = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+
+function formatEventDate(value: string): string {
+  const parts = value.split("-");
+  if (parts.length === 3) {
+    const year = Number(parts[0]);
+    const month = MONTHS[Number(parts[1]) - 1];
+    const day = Number(parts[2]);
+    if (month && !Number.isNaN(year) && !Number.isNaN(day)) {
+      return `${month} ${day}, ${year}`;
+    }
+  }
+  return value;
+}
+
+function toCardItem(event: ApiEvent): EventItem {
+  return {
+    id: event.id,
+    title: event.title,
+    image: event.image || "/images/hero-bg.png",
+    date: formatEventDate(event.date),
+    genre: event.genre || event.category || "",
+    slug: "",
+    category: event.category,
+  };
+}
+
+interface HomeRows {
+  popular: EventItem[];
+  movies: EventItem[];
+  sports: EventItem[];
+  music: EventItem[];
+  theater: EventItem[];
+  conferences: EventItem[];
+  expos: EventItem[];
+  comedy: EventItem[];
+}
+
+const staticRows: HomeRows = {
+  popular: popularEvents,
+  movies: moviesEvents,
+  sports: sportsEvents,
+  music: musicEvents,
+  theater: theaterEvents,
+  conferences: conferenceEvents,
+  expos: expoEvents,
+  comedy: comedyEvents,
+};
+
+function groupByCategory(events: EventItem[]): HomeRows {
+  if (events.length === 0) return staticRows;
+
+  const rows: HomeRows = {
+    popular: events.slice(0, 12),
+    movies: [],
+    sports: [],
+    music: [],
+    theater: [],
+    conferences: [],
+    expos: [],
+    comedy: [],
+  };
+
+  for (const event of events) {
+    const category = (event.category || "").toLowerCase();
+    if (category.startsWith("movie")) rows.movies.push(event);
+    else if (category.startsWith("sport")) rows.sports.push(event);
+    else if (category.startsWith("festival") || category.startsWith("music")) rows.music.push(event);
+    else if (category.startsWith("theat")) rows.theater.push(event);
+    else if (category.startsWith("conference")) rows.conferences.push(event);
+    else if (category.startsWith("exhib") || category.startsWith("expo")) rows.expos.push(event);
+    else if (category.startsWith("comedy")) rows.comedy.push(event);
+  }
+
+  return rows;
+}
 
 function EventCard({ event }: { event: EventItem }) {
   const { t } = useLanguage();
@@ -200,6 +290,7 @@ function ContentRow({ title, events }: { title: string; events: EventItem[] }) {
 export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [dbEvents, setDbEvents] = useState<EventItem[]>([]);
   const { t } = useLanguage();
 
   const nextSlide = useCallback(() => {
@@ -221,6 +312,25 @@ export default function HomePage() {
     const interval = setInterval(nextSlide, 4000);
     return () => clearInterval(interval);
   }, [isAutoPlaying, nextSlide]);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/events")
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data: ApiEvent[]) => {
+        if (active && Array.isArray(data)) {
+          setDbEvents(data.map(toCardItem));
+        }
+      })
+      .catch(() => {
+        // Fall back to the static catalogue if the API is unavailable.
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const rows = useMemo(() => groupByCategory(dbEvents), [dbEvents]);
 
   const slide = featuredSlides[currentSlide];
 
@@ -298,14 +408,14 @@ export default function HomePage() {
       </section>
 
       <div className="mt-6 md:mt-8">
-        <ContentRow title={t("home.row.popular")} events={popularEvents} />
-        <ContentRow title={t("home.row.movies")} events={moviesEvents} />
-        <ContentRow title={t("home.row.sports")} events={sportsEvents} />
-        <ContentRow title={t("home.row.music")} events={musicEvents} />
-        <ContentRow title={t("home.row.theater")} events={theaterEvents} />
-        <ContentRow title={t("home.row.conferences")} events={conferenceEvents} />
-        <ContentRow title={t("home.row.expos")} events={expoEvents} />
-        <ContentRow title={t("home.row.comedy")} events={comedyEvents} />
+        {rows.popular.length > 0 && <ContentRow title={t("home.row.popular")} events={rows.popular} />}
+        {rows.movies.length > 0 && <ContentRow title={t("home.row.movies")} events={rows.movies} />}
+        {rows.sports.length > 0 && <ContentRow title={t("home.row.sports")} events={rows.sports} />}
+        {rows.music.length > 0 && <ContentRow title={t("home.row.music")} events={rows.music} />}
+        {rows.theater.length > 0 && <ContentRow title={t("home.row.theater")} events={rows.theater} />}
+        {rows.conferences.length > 0 && <ContentRow title={t("home.row.conferences")} events={rows.conferences} />}
+        {rows.expos.length > 0 && <ContentRow title={t("home.row.expos")} events={rows.expos} />}
+        {rows.comedy.length > 0 && <ContentRow title={t("home.row.comedy")} events={rows.comedy} />}
       </div>
 
       <footer className="mt-8 border-t border-gray-200 dark:border-white/10">

@@ -12,6 +12,7 @@ export async function getEventsWithTicketTypes(): Promise<Event[]> {
   return cached("events:list", async () => {
     const events = await prisma.event.findMany({
       include: { ticketTypes: true },
+      orderBy: { createdAt: "desc" },
     });
 
     const normalized = events.map((event) => ({
