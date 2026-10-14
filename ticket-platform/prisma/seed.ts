@@ -384,6 +384,7 @@ async function main() {
       name: "Demo User",
       email: "demo@example.com",
       password: "$2b$12$0N5qVZaz2c7wDQBGmGLgEOGdKThqJutzWdKA4erGzFrodwrxgbYL2",
+      isAdmin: true,
     },
   });
 

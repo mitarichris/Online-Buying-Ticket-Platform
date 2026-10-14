@@ -12,6 +12,7 @@ model User {
   name          String
   email         String         @unique
   password      String
+  isAdmin       Boolean        @default(false)
   createdAt     DateTime       @default(now())
   orders        Order[]
   notifications Notification[]
@@ -30,6 +31,7 @@ model Event {
   organizer   String
   genre       String?
   image       String?
+  createdAt   DateTime     @default(now())
   ticketTypes TicketType[]
 }
 

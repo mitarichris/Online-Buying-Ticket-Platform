@@ -23,6 +23,14 @@ export interface TicketType {
   description: string;
 }
 
+export interface EventSuggestion {
+  id: string;
+  title: string;
+  category: string;
+  city: string;
+  image: string | null;
+}
+
 export interface CartItem {
   eventId: string;
   eventTitle: string;

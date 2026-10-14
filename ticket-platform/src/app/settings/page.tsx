@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { Moon, Sun, User, Bell, Shield, CreditCard, Languages, LogOut } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ChangePasswordForm } from "@/components/account/ChangePasswordForm";
 import { useTheme } from "@/components/theme-provider";
 import { toast } from "sonner";
 import { useLanguage } from "@/i18n/LanguageProvider";
@@ -51,6 +52,7 @@ export default function SettingsPage() {
   const { t } = useLanguage();
   const { data: session, status } = useSession();
   const { theme, setTheme } = useTheme();
+  const router = useRouter();
   const [emailAlerts, setEmailAlerts] = useState(true);
   const [paymentAlerts, setPaymentAlerts] = useState(true);
   const [orderUpdates, setOrderUpdates] = useState(true);
@@ -122,6 +124,9 @@ export default function SettingsPage() {
               <span className="font-medium text-gray-900 dark:text-white">{t("settings.email")}</span>{" "}
               {session?.user?.email || "\u2014"}
             </p>
+            <Button variant="outline" size="sm" onClick={() => router.push("/account")}>
+              {t("settings.editProfile")}
+            </Button>
             <p className="text-xs text-gray-400 dark:text-gray-500">
               {t("settings.profileHint")}
             </p>
@@ -166,25 +171,18 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card id="security" className="scroll-mt-20">
           <CardHeader>
             <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
               <Shield className="h-5 w-5 text-[#B8942E]" />
               {t("settings.security")}
             </h2>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => toast.info(t("settings.passwordSoon"))}
-            >
-              <LockIcon className="mr-2 h-4 w-4" />
-              {t("settings.changePassword")}
-            </Button>
-            <p className="text-xs text-gray-400 dark:text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {t("settings.changePasswordHint")}
             </p>
+          </CardHeader>
+          <CardContent>
+            <ChangePasswordForm />
           </CardContent>
         </Card>
 
@@ -256,18 +254,5 @@ export default function SettingsPage() {
         </Card>
       </div>
     </div>
-  );
-}
-
-function LockIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-      />
-    </svg>
   );
 }

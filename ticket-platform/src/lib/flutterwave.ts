@@ -27,7 +27,7 @@ export interface FlutterwavePaymentResponse {
     processor_response: string;
     currency: string;
     payment_type: string;
-    meta: any;
+    meta: Record<string, unknown>;
   };
 }
 
@@ -40,7 +40,7 @@ export async function initiateCharge(
     );
   }
 
-  const payload: Record<string, any> = {
+  const payload: Record<string, unknown> = {
     tx_ref: payment.tx_ref,
     amount: payment.amount,
     currency: payment.currency,
@@ -89,7 +89,7 @@ export async function verifyTransaction(
     }
   );
 
-  const response: FlutterwavePaymentResponse & { data: any } = await res.json();
+  const response: FlutterwavePaymentResponse = await res.json();
 
   if (response.status !== "success") {
     throw new Error(

@@ -10,6 +10,22 @@ export function setCache<T>(key: string, value: T, ttlMs = DEFAULT_TTL_MS): void
   cache.set(key, { value, expiresAt: now + ttlMs, refreshedAt: now });
 }
 
+export function invalidateCache(...keys: string[]): void {
+  for (const key of keys) {
+    cache.delete(key);
+    inflight.delete(key);
+  }
+}
+
+export function invalidateCachePrefix(prefix: string): void {
+  for (const key of cache.keys()) {
+    if (key.startsWith(prefix)) cache.delete(key);
+  }
+  for (const key of inflight.keys()) {
+    if (key.startsWith(prefix)) inflight.delete(key);
+  }
+}
+
 export async function cached<T>(
   key: string,
   fn: () => Promise<T>,

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { CartItem, TicketType } from "@/types";
+import type { CartItem } from "@/types";
 
 interface CartState {
   items: CartItem[];

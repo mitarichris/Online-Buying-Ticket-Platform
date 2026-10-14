@@ -20,19 +20,33 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const valid = await bcrypt.compare(password, user.password);
         if (!valid) return null;
 
-        return { id: user.id, name: user.name, email: user.email };
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          isAdmin: user.isAdmin,
+        };
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
+        token.isAdmin = (user as { isAdmin?: boolean }).isAdmin ?? false;
+      }
+      if (trigger === "update" && session) {
+        const data = session as { name?: string; email?: string };
+        if (typeof data.name === "string") token.name = data.name;
+        if (typeof data.email === "string") token.email = data.email;
       }
       return token;
     },
     async session({ session, token }) {
-      session.user.id = token.id as string;
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.isAdmin = Boolean(token.isAdmin);
+      }
       return session;
     },
   },

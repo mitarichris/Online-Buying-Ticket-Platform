@@ -85,6 +85,11 @@ export function Header() {
               <SectionLabel>{t("nav.account")}</SectionLabel>
               {session ? (
                 <>
+                  {session.user?.isAdmin && (
+                    <MenuLink href="/admin/events" onClick={() => setMenuOpen(false)}>
+                      {t("nav.admin")}
+                    </MenuLink>
+                  )}
                   <MenuLink href="/account" onClick={() => setMenuOpen(false)}>{t("nav.account")}</MenuLink>
                   <MenuLink href="/orders" onClick={() => setMenuOpen(false)}>{t("nav.orders")}</MenuLink>
                   <MenuLink href="/notifications" onClick={() => setMenuOpen(false)}>{t("nav.notifications")}</MenuLink>

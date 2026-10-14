@@ -39,8 +39,8 @@ export default function RegisterPage() {
 
       toast.success(t("register.created"));
       router.push("/login");
-    } catch (err: any) {
-      toast.error(err.message || t("register.failed"));
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("register.failed"));
     } finally {
       setLoading(false);
     }
