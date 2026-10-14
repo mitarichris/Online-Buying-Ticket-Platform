@@ -407,6 +407,15 @@ const en: Dict = {
   "guide.free.step1": "Complete your booking as normal until you reach the payment step.",
   "guide.free.step2": "Toggle 'Use free ticket' before selecting a payment method.",
   "guide.free.step3": "Confirm your booking — no payment needed!",
+  "contact.whatsapp": "WhatsApp",
+  "contact.whatsappValue": "+250 795 994 454",
+  "contact.chat": "Chat on WhatsApp",
+  "checkout.useFreeTicket": "Use free ticket",
+  "checkout.freeAvailable": "You have {count} free ticket(s) available.",
+  "checkout.freeHint": "No payment needed — this booking is free.",
+  "checkout.confirmFree": "Confirm booking — No payment",
+  "checkout.state.free": "Free Ticket",
+  "checkout.freeSuccess": "Your free ticket was used. Your booking is confirmed!",
 };
 
 const rw: Dict = {
@@ -779,6 +788,15 @@ const rw: Dict = {
   "guide.free.step1": "Komeza kwishyura nk'ibisanzwe kugeza ugeze ku ntambwe yo kwishyura.",
   "guide.free.step2": "Fungura 'Koresha itike y'ubuntu' mbere yo guhitamo uburyo bwo kwishyura.",
   "guide.free.step3": "Emeza itike yawe — nta kwishyura gukenewe!",
+  "contact.whatsapp": "WhatsApp",
+  "contact.whatsappValue": "+250 795 994 454",
+  "contact.chat": "Vugana natwe kuri WhatsApp",
+  "checkout.useFreeTicket": "Koresha itike y'ubuntu",
+  "checkout.freeAvailable": "Ufite itike {count} y'ubuntu ihari.",
+  "checkout.freeHint": "Nta kwishyura gukenewe — iyi booking ni ubuntu.",
+  "checkout.confirmFree": "Emeza booking — Nta kwishyura",
+  "checkout.state.free": "Itike y'Ubuntu",
+  "checkout.freeSuccess": "Itike yawe y'ubuntu yakoreshejwe. Booking yawe yemejwe!",
 };
 
 const fr: Dict = {
@@ -1151,6 +1169,15 @@ const fr: Dict = {
   "guide.free.step1": "Effectuez votre réservation normalement jusqu'à l'étape de paiement.",
   "guide.free.step2": "Activez « Utiliser le billet gratuit » avant de choisir une méthode de paiement.",
   "guide.free.step3": "Confirmez votre réservation — aucun paiement requis !",
+  "contact.whatsapp": "WhatsApp",
+  "contact.whatsappValue": "+250 795 994 454",
+  "contact.chat": "Discuter sur WhatsApp",
+  "checkout.useFreeTicket": "Utiliser le billet gratuit",
+  "checkout.freeAvailable": "Vous avez {count} billet(s) gratuit(s) disponible(s).",
+  "checkout.freeHint": "Aucun paiement requis — cette réservation est gratuite.",
+  "checkout.confirmFree": "Confirmer la réservation — Aucun paiement",
+  "checkout.state.free": "Billet gratuit",
+  "checkout.freeSuccess": "Votre billet gratuit a été utilisé. Votre réservation est confirmée !",
 };
 
 export const translations: Record<Locale, Dict> = { en, rw, fr };

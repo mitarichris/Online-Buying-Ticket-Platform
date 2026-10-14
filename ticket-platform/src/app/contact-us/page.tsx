@@ -8,6 +8,8 @@ export default function ContactPage() {
 
   const email = t("contact.emailValue");
   const phone = t("contact.phoneValue");
+  const whatsapp = t("contact.whatsappValue");
+  const whatsappLink = `https://wa.me/${whatsapp.replace(/[^0-9]/g, "")}`;
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">
@@ -58,6 +60,26 @@ export default function ContactPage() {
               className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
             >
               {t("contact.call")}
+            </a>
+          </div>
+
+          <div className="flex flex-col gap-3 rounded-xl border border-gray-200 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-gray-700">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#25D366]/15">
+                <MessageCircle className="h-5 w-5 text-[#25D366]" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{t("contact.whatsapp")}</p>
+                <p className="font-medium text-gray-900 dark:text-white">{whatsapp}</p>
+              </div>
+            </div>
+            <a
+              href={whatsappLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center rounded-lg bg-[#25D366] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#1EBE5B]"
+            >
+              {t("contact.chat")}
             </a>
           </div>
         </div>

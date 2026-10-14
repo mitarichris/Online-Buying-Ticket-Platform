@@ -15,6 +15,7 @@ import { useLanguage } from "@/i18n/LanguageProvider";
 const PROVIDER_LABELS: Record<string, string> = {
   mtn: "MTN MoMo",
   airtel: "Airtel Money",
+  free_ticket: "Free Ticket",
 };
 
 function downloadReceipt(order: Order, buyerName: string) {

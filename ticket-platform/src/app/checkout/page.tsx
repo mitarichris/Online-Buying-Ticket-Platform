@@ -44,6 +44,8 @@ export default function CheckoutPage() {
   const [referenceId, setReferenceId] = useState("");
   const [network, setNetwork] = useState("");
   const [provider, setProvider] = useState<Provider | null>(null);
+  const [freeAvailable, setFreeAvailable] = useState(0);
+  const [useFreeTicket, setUseFreeTicket] = useState(false);
 
   const total = getTotal();
 
@@ -53,6 +55,18 @@ export default function CheckoutPage() {
       router.push("/login");
     }
   }, [status, router, t]);
+
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    fetch("/api/free-tickets")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { available?: number } | null) => {
+        if (data && typeof data.available === "number") {
+          setFreeAvailable(data.available);
+        }
+      })
+      .catch(() => {});
+  }, [status]);
 
   const pollPaymentStatus = useCallback(
     async (refId: string) => {
@@ -99,6 +113,47 @@ export default function CheckoutPage() {
 
   async function handlePay(e: React.FormEvent) {
     e.preventDefault();
+
+    const orderPayload = {
+      name,
+      items: items.map((i) => ({
+        eventId: i.eventId,
+        eventTitle: i.eventTitle,
+        ticketTypeId: i.ticketTypeId,
+        ticketTypeName: i.ticketTypeName,
+        quantity: i.quantity,
+        unitPrice: i.price,
+      })),
+      total,
+    };
+
+    if (useFreeTicket) {
+      setLoading(true);
+      try {
+        const res = await fetch("/api/orders", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...orderPayload, useFreeTicket: true }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => null);
+          throw new Error(err?.error || t("checkout.somethingWentWrong"));
+        }
+
+        setPaymentState("success");
+        clearCart();
+        toast.success(t("checkout.freeSuccess"));
+        setTimeout(() => router.push("/orders"), 800);
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : t("checkout.somethingWentWrong"));
+        setPaymentState("failed");
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
     if (!provider) {
       toast.error(t("checkout.selectMethod"));
       return;
@@ -111,19 +166,6 @@ export default function CheckoutPage() {
     setLoading(true);
 
     try {
-      const orderPayload = {
-        name,
-        items: items.map((i) => ({
-          eventId: i.eventId,
-          eventTitle: i.eventTitle,
-          ticketTypeId: i.ticketTypeId,
-          ticketTypeName: i.ticketTypeName,
-          quantity: i.quantity,
-          unitPrice: i.price,
-        })),
-        total,
-      };
-
       const orderRes = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -203,38 +245,33 @@ export default function CheckoutPage() {
       <Card>
         <CardHeader>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            {paymentState === "form" && t("checkout.state.payment")}
+            {paymentState === "form" && (useFreeTicket ? t("checkout.state.free") : t("checkout.state.payment"))}
             {paymentState === "processing" && t("checkout.state.processing")}
-            {paymentState === "success" && t("checkout.state.success")}
+            {paymentState === "success" && (useFreeTicket ? t("checkout.state.free") : t("checkout.state.success"))}
             {paymentState === "failed" && t("checkout.state.failed")}
           </h2>
         </CardHeader>
         <CardContent>
           {paymentState === "form" && (
             <form onSubmit={handlePay} className="space-y-4">
-              <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("checkout.method")}</label>
-                <div className="grid grid-cols-2 gap-3">
-                  {(Object.keys(PROVIDERS) as Provider[]).map((key) => {
-                    const prov = PROVIDERS[key];
-                    const isSelected = provider === key;
-                    return (
-                      <button
-                        key={key}
-                        type="button"
-                        onClick={() => setProvider(key)}
-                        className={`rounded-lg border-2 px-4 py-3 text-sm font-semibold transition-all ${
-                          isSelected
-                            ? `${prov.border} ${prov.bg} ${prov.text} shadow-md`
-                            : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50"
-                        }`}
-                      >
-                        {prov.name}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+              {freeAvailable > 0 && (
+                <label className="flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-[#D4AF37]/40 bg-[#D4AF37]/10 p-4">
+                  <span>
+                    <span className="block text-sm font-medium text-gray-900 dark:text-white">
+                      {t("checkout.useFreeTicket")}
+                    </span>
+                    <span className="mt-0.5 block text-xs text-gray-500 dark:text-gray-400">
+                      {t("checkout.freeAvailable", { count: freeAvailable })}
+                    </span>
+                  </span>
+                  <input
+                    type="checkbox"
+                    checked={useFreeTicket}
+                    onChange={(e) => setUseFreeTicket(e.target.checked)}
+                    className="h-5 w-5 accent-[#D4AF37]"
+                  />
+                </label>
+              )}
 
               <Input
                 id="name"
@@ -243,25 +280,63 @@ export default function CheckoutPage() {
                 onChange={(e) => setName(e.target.value)}
                 required
               />
-              <Input
-                id="phone"
-                label={t("checkout.momoNumber")}
-                placeholder={t("checkout.phonePlaceholder")}
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-              />
-              {mismatch && (
-                <p className="text-sm text-red-600 dark:text-red-400">
-                  {t("checkout.networkMismatch", { detected: detectedName })}
-                </p>
+
+              {useFreeTicket ? (
+                <p className="text-sm text-gray-500 dark:text-gray-400">{t("checkout.freeHint")}</p>
+              ) : (
+                <>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">{t("checkout.method")}</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {(Object.keys(PROVIDERS) as Provider[]).map((key) => {
+                        const prov = PROVIDERS[key];
+                        const isSelected = provider === key;
+                        return (
+                          <button
+                            key={key}
+                            type="button"
+                            onClick={() => setProvider(key)}
+                            className={`rounded-lg border-2 px-4 py-3 text-sm font-semibold transition-all ${
+                              isSelected
+                                ? `${prov.border} ${prov.bg} ${prov.text} shadow-md`
+                                : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50"
+                            }`}
+                          >
+                            {prov.name}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <Input
+                    id="phone"
+                    label={t("checkout.momoNumber")}
+                    placeholder={t("checkout.phonePlaceholder")}
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    required
+                  />
+                  {mismatch && (
+                    <p className="text-sm text-red-600 dark:text-red-400">
+                      {t("checkout.networkMismatch", { detected: detectedName })}
+                    </p>
+                  )}
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {t("checkout.sent", { provider: provider ? PROVIDERS[provider].name : t("checkout.state.mobile") })}
+                  </p>
+                </>
               )}
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {t("checkout.sent", { provider: provider ? PROVIDERS[provider].name : t("checkout.state.mobile") })}
-              </p>
-              <Button type="submit" loading={loading} disabled={mismatch} size="lg" className="w-full">
-                {t("checkout.pay", { amount: formatCurrency(total), provider: provider ? PROVIDERS[provider].name : t("checkout.state.mobile") })}
-              </Button>
+
+              {useFreeTicket ? (
+                <Button type="submit" loading={loading} size="lg" className="w-full">
+                  {t("checkout.confirmFree")}
+                </Button>
+              ) : (
+                <Button type="submit" loading={loading} disabled={mismatch} size="lg" className="w-full">
+                  {t("checkout.pay", { amount: formatCurrency(total), provider: provider ? PROVIDERS[provider].name : t("checkout.state.mobile") })}
+                </Button>
+              )}
             </form>
           )}
 
@@ -292,7 +367,9 @@ export default function CheckoutPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <p className="text-lg font-medium text-gray-900 dark:text-white">{t("checkout.paymentSuccess")}</p>
+              <p className="text-lg font-medium text-gray-900 dark:text-white">
+                {useFreeTicket ? t("checkout.freeSuccess") : t("checkout.paymentSuccess")}
+              </p>
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t("checkout.redirecting")}</p>
             </div>
           )}
