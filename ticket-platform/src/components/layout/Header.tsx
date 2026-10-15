@@ -100,7 +100,7 @@ export function Header() {
                   <button
                     onClick={() => {
                       setMenuOpen(false);
-                      signOut();
+                      signOut({ callbackUrl: "/login" });
                     }}
                     className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-700 transition hover:bg-gray-100 hover:text-gray-900 dark:text-white/80 dark:hover:bg-white/5 dark:hover:text-white"
                   >

@@ -289,7 +289,7 @@ export default function SettingsPage() {
             </h2>
           </CardHeader>
           <CardContent>
-            <Button variant="danger" className="w-full" onClick={() => signOut()}>
+            <Button variant="danger" className="w-full" onClick={() => signOut({ callbackUrl: "/login" })}>
               {t("settings.signOut")}
             </Button>
           </CardContent>
