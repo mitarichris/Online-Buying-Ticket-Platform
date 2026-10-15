@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Bell, CalendarClock, X } from "lucide-react";
@@ -34,11 +34,13 @@ export function UpcomingEventPopup() {
   const { t } = useLanguage();
   const [reminders, setReminders] = useState<ReminderNotification[]>([]);
   const [open, setOpen] = useState(false);
+  const [visible, setVisible] = useState(false);
+
+  const userId = session?.user?.id;
 
   useEffect(() => {
-    if (status !== "authenticated" || !session?.user?.id) return;
+    if (status !== "authenticated" || !userId) return;
     let active = true;
-    const userId = session.user.id;
 
     fetch("/api/notifications")
       .then((res) => (res.ok ? res.json() : []))
@@ -59,45 +61,57 @@ export function UpcomingEventPopup() {
     return () => {
       active = false;
     };
-  }, [status, session?.user?.id]);
+  }, [status, userId]);
 
-  function dismiss() {
-    if (session?.user?.id) {
-      const merged = Array.from(
-        new Set([...readShown(session.user.id), ...reminders.map((r) => r.id)])
-      );
+  useEffect(() => {
+    if (!open) return;
+    const frame = requestAnimationFrame(() => setVisible(true));
+    return () => cancelAnimationFrame(frame);
+  }, [open]);
+
+  const dismiss = useCallback(() => {
+    if (userId) {
+      const merged = Array.from(new Set([...readShown(userId), ...reminders.map((r) => r.id)]));
       try {
-        localStorage.setItem(shownKey(session.user.id), JSON.stringify(merged));
+        localStorage.setItem(shownKey(userId), JSON.stringify(merged));
       } catch {
         // Ignore storage failures (e.g. private mode).
       }
     }
-    setOpen(false);
-  }
+    setVisible(false);
+    window.setTimeout(() => setOpen(false), 250);
+  }, [userId, reminders]);
+
+  useEffect(() => {
+    if (!open) return;
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") dismiss();
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open, dismiss]);
 
   if (!open || reminders.length === 0) return null;
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4"
-      onClick={dismiss}
-      role="dialog"
-      aria-modal="true"
+      className="fixed inset-x-3 top-20 z-[100] flex justify-end sm:inset-x-auto sm:right-4"
+      role="region"
+      aria-live="polite"
     >
       <div
-        className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl dark:border-white/10 dark:bg-[#171a20]"
-        onClick={(event) => event.stopPropagation()}
+        className={`w-full max-w-sm rounded-2xl border border-gray-200 bg-white p-5 shadow-2xl transition-all duration-300 ease-out dark:border-white/10 dark:bg-[#171a20] ${
+          visible ? "translate-x-0 opacity-100" : "translate-x-6 opacity-0"
+        }`}
       >
         <div className="mb-4 flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D4AF37]/15">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#D4AF37]/15">
               <Bell className="h-5 w-5 text-[#B8942E]" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                {t("popup.title")}
-              </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">{t("popup.subtitle")}</p>
+              <h2 className="font-bold text-gray-900 dark:text-white">{t("popup.title")}</h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{t("popup.subtitle")}</p>
             </div>
           </div>
           <button
@@ -110,16 +124,16 @@ export function UpcomingEventPopup() {
           </button>
         </div>
 
-        <div className="space-y-3">
+        <div className="max-h-[55vh] space-y-3 overflow-y-auto">
           {reminders.map((reminder) => (
             <div
               key={reminder.id}
-              className="rounded-xl border border-gray-200 p-4 dark:border-gray-800"
+              className="rounded-xl border border-gray-200 p-3.5 dark:border-gray-800"
             >
               <div className="flex items-start gap-3">
                 <CalendarClock className="mt-0.5 h-5 w-5 shrink-0 text-[#B8942E]" />
                 <div>
-                  <p className="font-semibold text-gray-900 dark:text-white">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
                     {reminder.title.replace(/^Reminder:\s*/, "")}
                   </p>
                   <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
@@ -140,7 +154,7 @@ export function UpcomingEventPopup() {
           ))}
         </div>
 
-        <Button className="mt-5 w-full" onClick={dismiss}>
+        <Button className="mt-4 w-full" size="sm" onClick={dismiss}>
           {t("popup.dismiss")}
         </Button>
       </div>
