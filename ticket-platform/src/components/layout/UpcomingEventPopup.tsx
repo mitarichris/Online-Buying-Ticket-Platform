@@ -21,6 +21,7 @@ export function UpcomingEventPopup() {
   const [reminders, setReminders] = useState<ReminderNotification[]>([]);
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [paused, setPaused] = useState(false);
 
   const userId = session?.user?.id;
 
@@ -70,6 +71,12 @@ export function UpcomingEventPopup() {
   }, [reminders]);
 
   useEffect(() => {
+    if (!open || paused) return;
+    const timer = window.setTimeout(() => dismiss(), 7000);
+    return () => window.clearTimeout(timer);
+  }, [open, paused, dismiss]);
+
+  useEffect(() => {
     if (!open) return;
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") dismiss();
@@ -87,6 +94,8 @@ export function UpcomingEventPopup() {
       aria-live="polite"
     >
       <div
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
         className={`w-full max-w-sm rounded-2xl border border-gray-200 bg-white p-5 shadow-2xl transition-all duration-300 ease-out dark:border-white/10 dark:bg-[#171a20] ${
           visible ? "translate-x-0 opacity-100" : "translate-x-6 opacity-0"
         }`}
