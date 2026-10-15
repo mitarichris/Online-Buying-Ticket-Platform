@@ -53,7 +53,7 @@ async function runEventReminders(userId: string): Promise<number> {
   const eventIds = upcoming.map((entry) => entry.event.id);
 
   const existingReminders = await prisma.notification.findMany({
-    where: { userId, eventId: { in: eventIds } },
+    where: { userId, eventId: { in: eventIds }, title: { startsWith: "Reminder:" } },
     select: { eventId: true },
   });
   const alreadyReminded = new Set(existingReminders.map((n) => n.eventId));

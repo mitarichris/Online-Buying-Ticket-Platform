@@ -15,20 +15,6 @@ interface ReminderNotification {
   read: boolean;
 }
 
-function shownKey(userId: string) {
-  return `reminderPopup:${userId}`;
-}
-
-function readShown(userId: string): string[] {
-  try {
-    const raw = localStorage.getItem(shownKey(userId));
-    const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
 export function UpcomingEventPopup() {
   const { status, data: session } = useSession();
   const { t } = useLanguage();
@@ -46,11 +32,13 @@ export function UpcomingEventPopup() {
       .then((res) => (res.ok ? res.json() : []))
       .then((data: ReminderNotification[]) => {
         if (!active || !Array.isArray(data)) return;
-        const reminderNotifications = data.filter(
-          (n) => n.eventId && typeof n.title === "string" && n.title.startsWith("Reminder:")
+        const fresh = data.filter(
+          (n) =>
+            !n.read &&
+            n.eventId &&
+            typeof n.title === "string" &&
+            n.title.startsWith("Reminder:")
         );
-        const shown = readShown(userId);
-        const fresh = reminderNotifications.filter((n) => !shown.includes(n.id));
         if (fresh.length > 0) {
           setReminders(fresh);
           setOpen(true);
@@ -70,17 +58,16 @@ export function UpcomingEventPopup() {
   }, [open]);
 
   const dismiss = useCallback(() => {
-    if (userId) {
-      const merged = Array.from(new Set([...readShown(userId), ...reminders.map((r) => r.id)]));
-      try {
-        localStorage.setItem(shownKey(userId), JSON.stringify(merged));
-      } catch {
-        // Ignore storage failures (e.g. private mode).
-      }
+    if (reminders.length > 0) {
+      fetch("/api/notifications", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: reminders.map((r) => r.id) }),
+      }).catch(() => {});
     }
     setVisible(false);
     window.setTimeout(() => setOpen(false), 250);
-  }, [userId, reminders]);
+  }, [reminders]);
 
   useEffect(() => {
     if (!open) return;
