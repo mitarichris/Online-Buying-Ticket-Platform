@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { ChevronLeft, ChevronRight, Ticket } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageProvider";
+import { isPastEvent } from "@/lib/event-date";
 
 const featuredSlides = [
   {
@@ -166,15 +167,19 @@ interface HomeRows {
   comedy: EventItem[];
 }
 
+function upcomingOnly<T extends { date: string }>(items: T[]): T[] {
+  return items.filter((item) => !isPastEvent(item.date));
+}
+
 const staticRows: HomeRows = {
-  popular: popularEvents,
-  movies: moviesEvents,
-  sports: sportsEvents,
-  music: musicEvents,
-  theater: theaterEvents,
-  conferences: conferenceEvents,
-  expos: expoEvents,
-  comedy: comedyEvents,
+  popular: upcomingOnly(popularEvents),
+  movies: upcomingOnly(moviesEvents),
+  sports: upcomingOnly(sportsEvents),
+  music: upcomingOnly(musicEvents),
+  theater: upcomingOnly(theaterEvents),
+  conferences: upcomingOnly(conferenceEvents),
+  expos: upcomingOnly(expoEvents),
+  comedy: upcomingOnly(comedyEvents),
 };
 
 function groupByCategory(events: EventItem[]): HomeRows {
@@ -293,13 +298,29 @@ export default function HomePage() {
   const [dbEvents, setDbEvents] = useState<EventItem[]>([]);
   const { t } = useLanguage();
 
+  const heroSlides = useMemo(() => {
+    if (dbEvents.length > 0) {
+      return dbEvents.slice(0, 6).map((event) => ({
+        image: event.image,
+        title: event.title,
+        date: event.date,
+        genre: event.genre,
+        category: event.category ?? "",
+      }));
+    }
+    const fallback = upcomingOnly(featuredSlides);
+    return fallback.length > 0 ? fallback : featuredSlides;
+  }, [dbEvents]);
+
   const nextSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev + 1) % featuredSlides.length);
-  }, []);
+    setCurrentSlide((prev) => (prev + 1) % Math.max(heroSlides.length, 1));
+  }, [heroSlides.length]);
 
   const prevSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev - 1 + featuredSlides.length) % featuredSlides.length);
-  }, []);
+    setCurrentSlide(
+      (prev) => (prev - 1 + Math.max(heroSlides.length, 1)) % Math.max(heroSlides.length, 1)
+    );
+  }, [heroSlides.length]);
 
   const goToSlide = useCallback((index: number) => {
     setCurrentSlide(index);
@@ -332,16 +353,17 @@ export default function HomePage() {
 
   const rows = useMemo(() => groupByCategory(dbEvents), [dbEvents]);
 
-  const slide = featuredSlides[currentSlide];
+  const activeSlide = heroSlides.length > 0 ? currentSlide % heroSlides.length : 0;
+  const slide = heroSlides[activeSlide];
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#101114]">
       <section className="relative w-full h-[200px] sm:h-[260px] md:h-[320px] lg:h-[400px] overflow-hidden">
-        {featuredSlides.map((s, index) => (
+        {heroSlides.map((s, index) => (
           <div
             key={index}
             className={`absolute inset-0 overflow-hidden transition-opacity duration-500 ${
-              index === currentSlide ? "opacity-100 z-[1]" : "opacity-0 z-0"
+              index === activeSlide ? "opacity-100 z-[1]" : "opacity-0 z-0"
             }`}
           >
             <Image
@@ -393,12 +415,12 @@ export default function HomePage() {
         </button>
 
         <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 z-20 flex gap-1.5">
-          {featuredSlides.map((_, index) => (
+          {heroSlides.map((_, index) => (
             <button
               key={index}
               onClick={() => goToSlide(index)}
               className={`h-2 rounded-full transition-all duration-300 ${
-                index === currentSlide
+                index === activeSlide
                   ? "w-6 bg-gradient-to-r from-[#0F172A] to-[#D4AF37]"
                   : "w-2 bg-white/40 hover:bg-white/60"
               }`}

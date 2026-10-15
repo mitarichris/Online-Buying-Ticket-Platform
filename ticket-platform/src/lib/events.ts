@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { cached, setCache } from "@/lib/cache";
+import { isPastEvent } from "@/lib/event-date";
 import type { Event } from "@/types";
 
 const EVENTS_TTL_MS = 300_000;
@@ -15,11 +16,13 @@ export async function getEventsWithTicketTypes(): Promise<Event[]> {
       orderBy: { createdAt: "desc" },
     });
 
-    const normalized = events.map((event) => ({
-      ...event,
-      genre: event.genre ?? undefined,
-      image: event.image ?? undefined,
-    }));
+    const normalized = events
+      .filter((event) => !isPastEvent(event.date))
+      .map((event) => ({
+        ...event,
+        genre: event.genre ?? undefined,
+        image: event.image ?? undefined,
+      }));
 
     for (const event of normalized) {
       setCache(eventKey(event.id), event, EVENTS_TTL_MS);

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { isPastEvent } from "@/lib/event-date";
 import type { EventSuggestion } from "@/types";
 
 export async function GET(request: Request) {
@@ -26,12 +27,14 @@ export async function GET(request: Request) {
         category: true,
         city: true,
         image: true,
+        date: true,
       },
       take: 20,
     });
 
     const lower = query.toLowerCase();
     const ranked = events
+      .filter((event) => !isPastEvent(event.date))
       .map((event) => {
         const title = event.title.toLowerCase();
         let score = 3;
@@ -41,7 +44,13 @@ export async function GET(request: Request) {
       })
       .sort((a, b) => a.score - b.score || a.event.title.localeCompare(b.event.title))
       .slice(0, 8)
-      .map(({ event }) => event as EventSuggestion);
+      .map(({ event }) => ({
+        id: event.id,
+        title: event.title,
+        category: event.category,
+        city: event.city,
+        image: event.image,
+      } as EventSuggestion));
 
     return NextResponse.json(ranked);
   } catch (error) {
