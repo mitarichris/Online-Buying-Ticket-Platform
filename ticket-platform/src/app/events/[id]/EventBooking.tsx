@@ -16,7 +16,6 @@ export function EventBooking({ event }: { event: Event }) {
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const addItem = useCartStore((s) => s.addItem);
   const clearCart = useCartStore((s) => s.clearCart);
-  const items = useCartStore((s) => s.items);
   const { t } = useLanguage();
 
   function handleQuantityChange(ticketTypeId: string, quantity: number) {
@@ -41,12 +40,10 @@ export function EventBooking({ event }: { event: Event }) {
     });
 
     if (addedCount > 0) {
-      // Clear cart if items from a different event exist
-      const hasDifferentEvent = items.some((item) => item.eventId !== event.id);
-      if (hasDifferentEvent) {
-        clearCart();
-      }
-      // Add items for current event
+      // The checkout must reflect only the current selection. Clear any items
+      // left from a previous visit so quantities are not added twice when the
+      // user goes back and proceeds to payment again.
+      clearCart();
       Object.entries(quantities).forEach(([ticketId, qty]) => {
         if (qty > 0) {
           const ticket = event.ticketTypes.find((t) => t.id === ticketId);
