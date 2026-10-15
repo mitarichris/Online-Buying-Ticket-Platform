@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
-import { Bell, CheckCheck } from "lucide-react";
+import Link from "next/link";
+import { Bell, CheckCheck, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { useLanguage } from "@/i18n/LanguageProvider";
 
 interface NotificationItem {
   id: string;
+  eventId?: string | null;
   title: string;
   message: string;
   read: boolean;
@@ -111,6 +113,15 @@ export default function NotificationsPage() {
                       <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">
                         {formatDate(n.createdAt)}
                       </p>
+                      {n.eventId && (
+                        <Link
+                          href={`/events/${n.eventId}`}
+                          className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-[#B8942E] transition hover:text-[#8f7223] dark:text-[#D4AF37]"
+                        >
+                          {t("notif.bookNow")}
+                          <ArrowRight className="h-3.5 w-3.5" />
+                        </Link>
+                      )}
                     </div>
                   </div>
                 </div>

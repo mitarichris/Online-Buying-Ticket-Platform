@@ -7,6 +7,7 @@ import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { HeaderSearch } from "@/components/layout/HeaderSearch";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { NotificationBell } from "@/components/layout/NotificationBell";
 import { useLanguage } from "@/i18n/LanguageProvider";
 
 const categories = [
@@ -44,6 +45,8 @@ export function Header() {
           >
             {t("nav.events")}
           </Link>
+
+          <NotificationBell />
 
           <LanguageSwitcher />
 

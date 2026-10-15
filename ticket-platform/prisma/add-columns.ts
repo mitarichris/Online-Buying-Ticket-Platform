@@ -4,6 +4,7 @@ import "dotenv/config";
 const statements = [
   `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "isAdmin" BOOLEAN NOT NULL DEFAULT false`,
   `ALTER TABLE "Event" ADD COLUMN IF NOT EXISTS "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP`,
+  `ALTER TABLE "Notification" ADD COLUMN IF NOT EXISTS "eventId" TEXT`,
 ];
 
 async function main() {

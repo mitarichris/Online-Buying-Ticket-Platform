@@ -200,6 +200,7 @@ const en: Dict = {
   "notif.unread": "You have {count} unread notification(s).",
   "notif.empty": "No notifications yet.",
   "notif.new": "New",
+  "notif.bookNow": "Book now",
 
   // Settings
   "settings.title": "Settings",
@@ -592,6 +593,7 @@ const rw: Dict = {
   "notif.unread": "Ufite {count} amatangazo adasomwe.",
   "notif.empty": "Nta matangazo ukiriho.",
   "notif.new": "Bishya",
+  "notif.bookNow": "Fata itike ubu",
 
   "settings.title": "Igenamiterere",
   "settings.appearance": "Imiterere",
@@ -973,6 +975,7 @@ const fr: Dict = {
   "notif.unread": "Vous avez {count} notification(s) non lue(s).",
   "notif.empty": "Aucune notification pour le moment.",
   "notif.new": "Nouveau",
+  "notif.bookNow": "Réserver maintenant",
 
   "settings.title": "Paramètres",
   "settings.appearance": "Apparence",
