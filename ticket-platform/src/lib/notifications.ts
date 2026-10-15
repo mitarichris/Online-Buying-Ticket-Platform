@@ -3,11 +3,17 @@ import { prisma } from "@/lib/prisma";
 export interface NotificationInput {
   title: string;
   message: string;
+  eventId?: string;
 }
 
 export async function createNotification(userId: string, input: NotificationInput) {
   return prisma.notification.create({
-    data: { userId, title: input.title, message: input.message },
+    data: {
+      userId,
+      title: input.title,
+      message: input.message,
+      eventId: input.eventId ?? null,
+    },
   });
 }
 
@@ -20,6 +26,7 @@ export async function notifyAllUsers(input: NotificationInput): Promise<number> 
       userId: user.id,
       title: input.title,
       message: input.message,
+      eventId: input.eventId ?? null,
     })),
   });
 
@@ -27,6 +34,7 @@ export async function notifyAllUsers(input: NotificationInput): Promise<number> 
 }
 
 export async function notifyNewEvent(event: {
+  id?: string;
   title: string;
   date?: string;
   time?: string;
@@ -38,6 +46,7 @@ export async function notifyNewEvent(event: {
     .join(" · ");
 
   return notifyAllUsers({
+    eventId: event.id,
     title: `New Event: ${event.title}`,
     message: details
       ? `A new upcoming event has been added — ${event.title} (${details}). Grab your tickets now!`

@@ -97,6 +97,7 @@ export async function POST(request: Request) {
     let notified = 0;
     try {
       notified = await notifyNewEvent({
+        id: event.id,
         title: event.title,
         date: event.date,
         time: event.time,
