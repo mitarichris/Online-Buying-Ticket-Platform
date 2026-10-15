@@ -8,7 +8,7 @@ import { EventBooking } from "./EventBooking";
 import type { Event } from "@/types";
 
 export function EventDetailInfo({ event }: { event: Event }) {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
 
   return (
     <>
@@ -17,7 +17,7 @@ export function EventDetailInfo({ event }: { event: Event }) {
           <Calendar className="h-5 w-5 text-[#B8942E]" />
           <div>
             <p className="text-sm text-gray-500">{t("event.date")}</p>
-            <p className="font-medium">{formatDate(event.date)}</p>
+            <p className="font-medium">{formatDate(event.date, locale)}</p>
           </div>
         </div>
         <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4">

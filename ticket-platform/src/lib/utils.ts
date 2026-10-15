@@ -13,8 +13,14 @@ export function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
-export function formatDate(date: string): string {
-  return new Date(date).toLocaleDateString("en-US", {
+const DATE_LOCALES: Record<string, string> = {
+  en: "en-US",
+  rw: "rw-RW",
+  fr: "fr-FR",
+};
+
+export function formatDate(date: string, locale: string = "en"): string {
+  return new Date(date).toLocaleDateString(DATE_LOCALES[locale] ?? "en-US", {
     weekday: "long",
     year: "numeric",
     month: "long",

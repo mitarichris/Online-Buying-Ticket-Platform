@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Bell, CalendarClock, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getNotificationText } from "@/lib/notification-text";
 import { useLanguage } from "@/i18n/LanguageProvider";
 
 interface ReminderNotification {
@@ -121,7 +122,9 @@ export function UpcomingEventPopup() {
         </div>
 
         <div className="max-h-[55vh] space-y-3 overflow-y-auto">
-          {reminders.map((reminder) => (
+          {reminders.map((reminder) => {
+            const text = getNotificationText(reminder, t);
+            return (
             <div
               key={reminder.id}
               className="rounded-xl border border-gray-200 p-3.5 dark:border-gray-800"
@@ -130,10 +133,10 @@ export function UpcomingEventPopup() {
                 <CalendarClock className="mt-0.5 h-5 w-5 shrink-0 text-[#B8942E]" />
                 <div>
                   <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                    {reminder.title.replace(/^Reminder:\s*/, "")}
+                    {text.title}
                   </p>
                   <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
-                    {reminder.message}
+                    {text.message}
                   </p>
                   {reminder.eventId && (
                     <Link
@@ -147,7 +150,8 @@ export function UpcomingEventPopup() {
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         <Button className="mt-4 w-full" size="sm" onClick={dismiss}>

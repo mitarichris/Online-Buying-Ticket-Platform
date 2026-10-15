@@ -174,7 +174,7 @@ const STATUS_KEYS: Record<string, string> = {
 };
 
 export default function OrdersPage() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const { data: session, status } = useSession();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -246,7 +246,9 @@ export default function OrdersPage() {
                       </Badge>
                       {order.paymentProvider && (
                         <Badge variant="info">
-                          {PROVIDER_LABELS[order.paymentProvider] || order.paymentProvider}
+                          {order.paymentProvider === "free_ticket"
+                            ? t("provider.freeTicket")
+                            : PROVIDER_LABELS[order.paymentProvider] || order.paymentProvider}
                         </Badge>
                       )}
                     </div>
@@ -259,7 +261,7 @@ export default function OrdersPage() {
                     <div className="mt-3 flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                       <span className="flex items-center gap-1">
                         <Calendar className="h-4 w-4" />
-                        {formatDate(order.createdAt)}
+                        {formatDate(order.createdAt, locale)}
                       </span>
                     </div>
                     <div className="mt-4 flex items-center justify-between">

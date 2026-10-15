@@ -11,7 +11,7 @@ import { useLanguage } from "@/i18n/LanguageProvider";
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, getTotal, clearCart } = useCartStore();
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
 
   if (items.length === 0) {
     return (
@@ -56,7 +56,7 @@ export default function CartPage() {
                 <Link href={`/events/${item.eventId}`} className="font-semibold text-gray-900 dark:text-white hover:text-[#B8942E]">
                   {item.eventTitle}
                 </Link>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{formatDate(item.eventDate)}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{formatDate(item.eventDate, locale)}</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{item.ticketTypeName}</p>
                 <p className="mt-1 font-medium text-gray-900 dark:text-white">{t("cart.each", { price: formatCurrency(item.price) })}</p>
               </div>

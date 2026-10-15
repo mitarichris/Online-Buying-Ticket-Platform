@@ -10,7 +10,7 @@ import { formatDate, formatCurrency } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageProvider";
 
 export function EventCard({ event }: { event: Event }) {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   return (
     <Link href={`/events/${event.id}`}>
       <Card className="overflow-hidden transition-shadow hover:shadow-md">
@@ -37,7 +37,7 @@ export function EventCard({ event }: { event: Event }) {
           <div className="space-y-1.5 text-sm text-gray-500 dark:text-gray-400">
             <div className="flex items-center gap-1.5">
               <Calendar className="h-4 w-4" />
-              <span>{formatDate(event.date)}</span>
+              <span>{formatDate(event.date, locale)}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <Clock className="h-4 w-4" />

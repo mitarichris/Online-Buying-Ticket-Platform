@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
+import { getNotificationText } from "@/lib/notification-text";
 import { useLanguage } from "@/i18n/LanguageProvider";
 
 interface NotificationItem {
@@ -21,7 +22,7 @@ interface NotificationItem {
 }
 
 export default function NotificationsPage() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const { status } = useSession();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -94,7 +95,9 @@ export default function NotificationsPage() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {notifications.map((n) => (
+          {notifications.map((n) => {
+            const text = getNotificationText(n, t);
+            return (
             <Card key={n.id} className={n.read ? "opacity-70" : ""}>
               <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-4">
@@ -106,12 +109,12 @@ export default function NotificationsPage() {
                     />
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className="font-semibold text-gray-900 dark:text-white">{n.title}</p>
+                        <p className="font-semibold text-gray-900 dark:text-white">{text.title}</p>
                         {!n.read && <Badge>{t("notif.new")}</Badge>}
                       </div>
-                      <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">{n.message}</p>
+                      <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">{text.message}</p>
                       <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">
-                        {formatDate(n.createdAt)}
+                        {formatDate(n.createdAt, locale)}
                       </p>
                       {n.eventId && (
                         <Link
@@ -127,7 +130,8 @@ export default function NotificationsPage() {
                 </div>
               </CardContent>
             </Card>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
