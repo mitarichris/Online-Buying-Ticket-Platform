@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { parseEventDate } from "@/lib/event-date";
 
-const REMINDER_WINDOW_DAYS = 3;
+const REMINDER_WINDOW_DAYS = 7;
 
 function startOfToday(): Date {
   const now = new Date();
@@ -21,12 +21,25 @@ function whenText(days: number): string {
   return `in ${days} days`;
 }
 
+const inFlight = new Map<string, Promise<number>>();
+
 /**
  * Creates reminder notifications for events happening soon (today or within the
  * next few days) so users do not miss out. Reminders are generated lazily the
  * next time the user loads their notifications, and only once per event.
  */
-export async function generateEventReminders(userId: string): Promise<number> {
+export function generateEventReminders(userId: string): Promise<number> {
+  const running = inFlight.get(userId);
+  if (running) return running;
+
+  const promise = runEventReminders(userId).finally(() => {
+    inFlight.delete(userId);
+  });
+  inFlight.set(userId, promise);
+  return promise;
+}
+
+async function runEventReminders(userId: string): Promise<number> {
   const events = await prisma.event.findMany({
     select: { id: true, title: true, date: true, time: true, venue: true, city: true },
   });

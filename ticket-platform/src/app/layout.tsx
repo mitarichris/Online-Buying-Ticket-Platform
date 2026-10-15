@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { UpcomingEventPopup } from "@/components/layout/UpcomingEventPopup";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,6 +27,7 @@ export default function RootLayout({
             <main className="flex-1">{children}</main>
             <Footer />
           </div>
+          <UpcomingEventPopup />
         </Providers>
       </body>
     </html>

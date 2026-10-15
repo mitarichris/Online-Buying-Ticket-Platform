@@ -202,6 +202,11 @@ const en: Dict = {
   "notif.new": "New",
   "notif.bookNow": "Book now",
 
+  // Upcoming event popup
+  "popup.title": "Upcoming event reminder",
+  "popup.subtitle": "Don't miss out — book your tickets!",
+  "popup.dismiss": "Got it",
+
   // Settings
   "settings.title": "Settings",
   "settings.appearance": "Appearance",
@@ -595,6 +600,10 @@ const rw: Dict = {
   "notif.new": "Bishya",
   "notif.bookNow": "Fata itike ubu",
 
+  "popup.title": "Ubutumwa bw'ibirori biri hafi",
+  "popup.subtitle": "Ntugatakaze amahirwe — fata itike yawe!",
+  "popup.dismiss": "Byumvikane",
+
   "settings.title": "Igenamiterere",
   "settings.appearance": "Imiterere",
   "settings.darkMode": "Dark Mode",
@@ -976,6 +985,10 @@ const fr: Dict = {
   "notif.empty": "Aucune notification pour le moment.",
   "notif.new": "Nouveau",
   "notif.bookNow": "Réserver maintenant",
+
+  "popup.title": "Rappel d'événement à venir",
+  "popup.subtitle": "Ne manquez pas ça — réservez vos billets !",
+  "popup.dismiss": "Compris",
 
   "settings.title": "Paramètres",
   "settings.appearance": "Apparence",
