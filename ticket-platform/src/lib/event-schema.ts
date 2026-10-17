@@ -20,7 +20,18 @@ export const eventInputSchema = z.object({
   category: z.string().trim().min(1, "Category is required"),
   organizer: z.string().trim().min(1, "Organizer is required"),
   genre: z.string().trim().optional(),
-  image: z.string().trim().optional(),
+  image: z
+    .string()
+    .trim()
+    .optional()
+    .refine(
+      (value) =>
+        !value ||
+        value.startsWith("/") ||
+        value.startsWith("http://") ||
+        value.startsWith("https://"),
+      "Image must be a site path like /images/photo.jpg or an http(s):// URL — local file paths (C:\\...) don't work"
+    ),
   ticketTypes: z.array(ticketTypeInputSchema).min(1, "Add at least one ticket type"),
 });
 

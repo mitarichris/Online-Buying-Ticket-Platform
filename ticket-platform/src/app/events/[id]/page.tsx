@@ -2,14 +2,9 @@ import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { EventHeroImage } from "./EventHeroImage";
 import { EventDetailInfo } from "./EventDetailInfo";
-import { getEventsWithTicketTypes, getEventWithTicketTypes } from "@/lib/events";
+import { getEventWithTicketTypes } from "@/lib/events";
 
-export const revalidate = 300;
-
-export async function generateStaticParams() {
-  const events = await getEventsWithTicketTypes();
-  return events.map((event) => ({ id: event.id }));
-}
+export const dynamic = "force-dynamic";
 
 export default async function EventDetailPage({
   params,

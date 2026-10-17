@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getEventsWithTicketTypes } from "@/lib/events";
-import { invalidateCache, invalidateCachePrefix } from "@/lib/cache";
+import { invalidateCache } from "@/lib/cache";
 import { notifyNewEvent } from "@/lib/notifications";
 import { eventInputSchema } from "@/lib/event-schema";
 
@@ -92,7 +92,6 @@ export async function POST(request: Request) {
     });
 
     invalidateCache("events:list");
-    invalidateCachePrefix("event:");
 
     let notified = 0;
     try {

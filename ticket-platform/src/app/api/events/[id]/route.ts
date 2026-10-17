@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { invalidateCache, invalidateCachePrefix } from "@/lib/cache";
+import { invalidateCache } from "@/lib/cache";
 import { eventInputSchema } from "@/lib/event-schema";
 
 export async function GET(
@@ -114,7 +114,6 @@ export async function PUT(
     });
 
     invalidateCache("events:list");
-    invalidateCachePrefix("event:");
 
     return NextResponse.json(event);
   } catch (error) {
