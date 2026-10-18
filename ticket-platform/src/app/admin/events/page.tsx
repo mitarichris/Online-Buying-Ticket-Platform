@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Plus, Trash2, CalendarPlus } from "lucide-react";
+import { Plus, Trash2, CalendarPlus, Pencil, X, Tag } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useLanguage } from "@/i18n/LanguageProvider";
+import type { Event } from "@/types";
 
-const categories = [
+const defaultCategories = [
   "Movies",
   "Sports",
   "Festivals",
@@ -20,7 +21,11 @@ const categories = [
   "Comedy",
 ];
 
+const CUSTOM_CATEGORIES_KEY = "admin:customCategories";
+const ADD_CATEGORY_VALUE = "__add__";
+
 interface TicketDraft {
+  id?: string;
   name: string;
   price: string;
   quantity: string;
@@ -44,7 +49,7 @@ const initialForm = {
   venue: "",
   address: "",
   city: "",
-  category: categories[0],
+  category: defaultCategories[0],
   organizer: "",
   genre: "",
   image: "",
@@ -59,6 +64,17 @@ export default function AdminEventsPage() {
   const [tickets, setTickets] = useState<TicketDraft[]>([{ ...emptyTicket }]);
   const [saving, setSaving] = useState(false);
 
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const [categories, setCategories] = useState<string[]>(defaultCategories);
+  const [addingCategory, setAddingCategory] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
+
+  const isAdmin = status === "authenticated" && session?.user?.isAdmin;
+
   useEffect(() => {
     if (status === "unauthenticated") {
       router.replace("/login");
@@ -66,6 +82,66 @@ export default function AdminEventsPage() {
       router.replace("/");
     }
   }, [status, session, router]);
+
+  const loadEvents = useCallback(() => {
+    let custom: string[] = [];
+    try {
+      const stored = window.localStorage.getItem(CUSTOM_CATEGORIES_KEY);
+      if (stored) {
+        const parsed: unknown = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          custom = parsed.filter(
+            (c): c is string => typeof c === "string" && c.trim() !== ""
+          );
+        }
+      }
+    } catch {
+      // Ignore corrupted localStorage.
+    }
+
+    return fetch("/api/events?all=1")
+      .then((res) =>
+        res.json().catch(() => []).then((data: unknown) => {
+          if (!res.ok) {
+            const message =
+              data && typeof data === "object" && "error" in data
+                ? (data as { error?: string }).error
+                : undefined;
+            throw new Error(message || t("admin.createFailed"));
+          }
+          return data;
+        })
+      )
+      .then((data) => {
+        const list: Event[] = Array.isArray(data) ? data : [];
+        setEvents(list);
+
+        const extra = [
+          ...custom,
+          ...list.map((event) => event.category).filter(Boolean),
+        ];
+        setCategories((current) => {
+          const merged = [...current];
+          for (const c of extra) {
+            if (!merged.some((x) => x.toLowerCase() === c.toLowerCase())) {
+              merged.push(c);
+            }
+          }
+          return merged;
+        });
+      })
+      .catch(() => {
+        // Keep whatever list we already have.
+      })
+      .finally(() => {
+        setLoadingEvents(false);
+      });
+  }, [t]);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    void loadEvents();
+  }, [isAdmin, loadEvents]);
 
   function updateField(key: keyof typeof form, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -85,6 +161,140 @@ export default function AdminEventsPage() {
     setTickets((prev) => prev.filter((_, i) => i !== index));
   }
 
+  function handleCategoryChange(value: string) {
+    if (value === ADD_CATEGORY_VALUE) {
+      setAddingCategory(true);
+      setNewCategory("");
+      return;
+    }
+    setAddingCategory(false);
+    updateField("category", value);
+  }
+
+  function addCategory() {
+    const name = newCategory.trim();
+    if (!name) return;
+
+    if (categories.some((c) => c.toLowerCase() === name.toLowerCase())) {
+      setForm((prev) => ({ ...prev, category: name }));
+      setAddingCategory(false);
+      setNewCategory("");
+      return;
+    }
+
+    setCategories((prev) => [...prev, name]);
+    setForm((prev) => ({ ...prev, category: name }));
+    setAddingCategory(false);
+    setNewCategory("");
+
+    try {
+      const stored = window.localStorage.getItem(CUSTOM_CATEGORIES_KEY);
+      const parsed: unknown = stored ? JSON.parse(stored) : [];
+      const custom = Array.isArray(parsed)
+        ? parsed.filter((c): c is string => typeof c === "string")
+        : [];
+      if (!custom.some((c) => c.toLowerCase() === name.toLowerCase())) {
+        window.localStorage.setItem(
+          CUSTOM_CATEGORIES_KEY,
+          JSON.stringify([...custom, name])
+        );
+      }
+    } catch {
+      // localStorage unavailable; category still works for this session.
+    }
+  }
+
+  function resetForm() {
+    setForm(initialForm);
+    setTickets([{ ...emptyTicket }]);
+    setEditingId(null);
+    setAddingCategory(false);
+    setNewCategory("");
+  }
+
+  async function startEdit(event: Event) {
+    setEditingId(event.id);
+    try {
+      const res = await fetch(`/api/events/${event.id}`);
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data) {
+        throw new Error();
+      }
+
+      setForm({
+        title: data.title ?? "",
+        description: data.description ?? "",
+        date: data.date ?? "",
+        time: data.time ?? "",
+        venue: data.venue ?? "",
+        address: data.address ?? "",
+        city: data.city ?? "",
+        category: data.category ?? initialForm.category,
+        organizer: data.organizer ?? "",
+        genre: data.genre ?? "",
+        image: data.image ?? "",
+      });
+      setTickets(
+        Array.isArray(data.ticketTypes) && data.ticketTypes.length > 0
+          ? data.ticketTypes.map(
+              (ticket: {
+                id: string;
+                name: string;
+                price: number;
+                quantity: number;
+                available: number;
+                description: string;
+              }): TicketDraft => ({
+                id: ticket.id,
+                name: ticket.name ?? "",
+                price: String(ticket.price ?? ""),
+                quantity: String(ticket.quantity ?? ""),
+                available: String(ticket.available ?? ""),
+                description: ticket.description ?? "",
+              })
+            )
+          : [{ ...emptyTicket }]
+      );
+
+      if (
+        data.category &&
+        !categories.some((c) => c.toLowerCase() === data.category.toLowerCase())
+      ) {
+        setCategories((prev) => [...prev, data.category]);
+      }
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch {
+      toast.error(t("admin.updateFailed"));
+      setEditingId(null);
+    }
+  }
+
+  async function handleDelete(event: Event) {
+    if (!window.confirm(t("admin.confirmDelete", { title: event.title }))) {
+      return;
+    }
+
+    setDeletingId(event.id);
+    try {
+      const res = await fetch(`/api/events/${event.id}`, { method: "DELETE" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || t("admin.deleteFailed"));
+      }
+
+      toast.success(t("admin.deleted"));
+      if (editingId === event.id) {
+        resetForm();
+      }
+      await loadEvents();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("admin.deleteFailed"));
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -95,33 +305,50 @@ export default function AdminEventsPage() {
 
     setSaving(true);
     try {
-      const res = await fetch("/api/events", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          genre: form.genre || undefined,
-          image: form.image || undefined,
-          ticketTypes: tickets.map((ticket) => ({
-            name: ticket.name,
-            price: Number(ticket.price),
-            quantity: Number(ticket.quantity),
-            available: ticket.available === "" ? undefined : Number(ticket.available),
-            description: ticket.description,
-          })),
-        }),
-      });
+      const payload = {
+        ...form,
+        genre: form.genre || undefined,
+        image: form.image || undefined,
+        ticketTypes: tickets.map((ticket) => ({
+          id: ticket.id,
+          name: ticket.name,
+          price: Number(ticket.price),
+          quantity: Number(ticket.quantity),
+          available: ticket.available === "" ? undefined : Number(ticket.available),
+          description: ticket.description,
+        })),
+      };
+
+      const res = await fetch(
+        editingId ? `/api/events/${editingId}` : "/api/events",
+        {
+          method: editingId ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
 
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(data.error || t("admin.createFailed"));
+        throw new Error(
+          data.error || t(editingId ? "admin.updateFailed" : "admin.createFailed")
+        );
       }
 
-      toast.success(t("admin.created", { count: data.notified ?? 0 }));
-      setForm(initialForm);
-      setTickets([{ ...emptyTicket }]);
+      if (editingId) {
+        toast.success(t("admin.updated"));
+      } else {
+        toast.success(t("admin.created", { count: data.notified ?? 0 }));
+      }
+
+      resetForm();
+      await loadEvents();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("admin.createFailed"));
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : t(editingId ? "admin.updateFailed" : "admin.createFailed")
+      );
     } finally {
       setSaving(false);
     }
@@ -140,12 +367,28 @@ export default function AdminEventsPage() {
       <div className="mb-8 flex items-center gap-3">
         <CalendarPlus className="h-7 w-7 text-[#B8942E]" />
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{t("admin.title")}</h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t("admin.subtitle")}</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            {editingId ? t("admin.editTitle") : t("admin.title")}
+          </h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            {editingId ? t("admin.editSubtitle") : t("admin.subtitle")}
+          </p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {editingId && (
+          <div className="flex items-center justify-between rounded-lg border border-[#D4AF37]/40 bg-[#D4AF37]/10 px-4 py-3">
+            <span className="text-sm font-medium text-gray-900 dark:text-white">
+              {t("admin.editing", { title: form.title })}
+            </span>
+            <Button type="button" variant="outline" size="sm" onClick={resetForm}>
+              <X className="mr-1 h-4 w-4" />
+              {t("admin.cancelEdit")}
+            </Button>
+          </div>
+        )}
+
         <Card>
           <CardHeader>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("admin.details")}</h2>
@@ -208,8 +451,8 @@ export default function AdminEventsPage() {
                   {t("admin.category")}
                 </label>
                 <select
-                  value={form.category}
-                  onChange={(e) => updateField("category", e.target.value)}
+                  value={addingCategory ? ADD_CATEGORY_VALUE : form.category}
+                  onChange={(e) => handleCategoryChange(e.target.value)}
                   className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-[#D4AF37] focus:outline-none focus:ring-1 focus:ring-[#D4AF37] dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                 >
                   {categories.map((category) => (
@@ -217,7 +460,21 @@ export default function AdminEventsPage() {
                       {category}
                     </option>
                   ))}
+                  <option value={ADD_CATEGORY_VALUE}>{t("admin.addCategory")}</option>
                 </select>
+                {addingCategory && (
+                  <div className="flex gap-2">
+                    <Input
+                      value={newCategory}
+                      onChange={(e) => setNewCategory(e.target.value)}
+                      placeholder={t("admin.newCategory")}
+                    />
+                    <Button type="button" size="sm" onClick={addCategory}>
+                      <Tag className="mr-1 h-4 w-4" />
+                      {t("admin.add")}
+                    </Button>
+                  </div>
+                )}
               </div>
               <Input
                 label={t("admin.organizer")}
@@ -314,9 +571,75 @@ export default function AdminEventsPage() {
         </Card>
 
         <Button type="submit" loading={saving} size="lg" className="w-full">
-          {t("admin.create")}
+          {editingId ? t("admin.update") : t("admin.create")}
         </Button>
       </form>
+
+      <Card className="mt-10">
+        <CardHeader>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            {t("admin.manageTitle")}
+          </h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {t("admin.manageSubtitle")}
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {loadingEvents ? (
+            <div className="space-y-3">
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="h-16 animate-pulse rounded-lg bg-gray-200 dark:bg-gray-800"
+                />
+              ))}
+            </div>
+          ) : events.length === 0 ? (
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {t("admin.noEvents")}
+            </p>
+          ) : (
+            events.map((event) => (
+              <div
+                key={event.id}
+                className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 p-3 dark:border-gray-800"
+              >
+                <div className="min-w-0">
+                  <p className="truncate font-medium text-gray-900 dark:text-white">
+                    {event.title}
+                  </p>
+                  <p className="truncate text-sm text-gray-500 dark:text-gray-400">
+                    {event.category} · {event.date} · {event.city}
+                  </p>
+                </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => startEdit(event)}
+                    disabled={deletingId === event.id}
+                  >
+                    <Pencil className="mr-1 h-4 w-4" />
+                    {t("admin.edit")}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDelete(event)}
+                    loading={deletingId === event.id}
+                    className="text-red-500 hover:text-red-600"
+                  >
+                    <Trash2 className="mr-1 h-4 w-4" />
+                    {t("admin.delete")}
+                  </Button>
+                </div>
+              </div>
+            ))
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -11,8 +11,20 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("q")?.toLowerCase();
     const category = searchParams.get("category");
+    const includeAll = searchParams.get("all") === "1";
 
     let events = await getEventsWithTicketTypes();
+
+    if (includeAll) {
+      const session = await auth();
+      if (!session?.user?.isAdmin) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+      events = await prisma.event.findMany({
+        include: { ticketTypes: true },
+        orderBy: { createdAt: "desc" },
+      });
+    }
 
     if (category?.trim()) {
       events = events.filter((event) =>

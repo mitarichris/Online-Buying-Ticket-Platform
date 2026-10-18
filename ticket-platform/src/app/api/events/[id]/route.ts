@@ -124,3 +124,43 @@ export async function PUT(
     );
   }
 }
+
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  if (!session.user.isAdmin) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const { id } = await params;
+
+  const existing = await prisma.event.findUnique({ where: { id } });
+  if (!existing) {
+    return NextResponse.json({ error: "Event not found" }, { status: 404 });
+  }
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.orderItem.deleteMany({
+        where: { ticketType: { eventId: id } },
+      });
+      await tx.ticketType.deleteMany({ where: { eventId: id } });
+      await tx.event.delete({ where: { id } });
+    });
+
+    invalidateCache("events:list");
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("Failed to delete event:", error);
+    return NextResponse.json(
+      { error: "Failed to delete event" },
+      { status: 500 }
+    );
+  }
+}
