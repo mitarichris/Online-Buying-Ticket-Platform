@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getEventsWithTicketTypes } from "@/lib/events";
+import { getAllEventsWithTicketTypes, getEventsWithTicketTypes } from "@/lib/events";
 import { invalidateCache } from "@/lib/cache";
 import { notifyNewEvent } from "@/lib/notifications";
 import { eventInputSchema } from "@/lib/event-schema";
@@ -20,10 +20,7 @@ export async function GET(request: Request) {
       if (!session?.user?.isAdmin) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
-      events = await prisma.event.findMany({
-        include: { ticketTypes: true },
-        orderBy: { createdAt: "desc" },
-      });
+      events = await getAllEventsWithTicketTypes();
     }
 
     if (category?.trim()) {

@@ -5,22 +5,25 @@ import type { Event } from "@/types";
 
 const EVENTS_TTL_MS = 30_000;
 
+export async function getAllEventsWithTicketTypes(): Promise<Event[]> {
+  const events = await prisma.event.findMany({
+    include: { ticketTypes: true },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return events.map((event) => ({
+    ...event,
+    genre: event.genre ?? undefined,
+    image: event.image ?? undefined,
+  }));
+}
+
 export async function getEventsWithTicketTypes(): Promise<Event[]> {
   return cached(
     "events:list",
     async () => {
-      const events = await prisma.event.findMany({
-        include: { ticketTypes: true },
-        orderBy: { createdAt: "desc" },
-      });
-
-      return events
-        .filter((event) => !isPastEvent(event.date))
-        .map((event) => ({
-          ...event,
-          genre: event.genre ?? undefined,
-          image: event.image ?? undefined,
-        }));
+      const events = await getAllEventsWithTicketTypes();
+      return events.filter((event) => !isPastEvent(event.date));
     },
     EVENTS_TTL_MS
   );
