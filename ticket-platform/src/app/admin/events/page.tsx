@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Plus, Trash2, CalendarPlus, Pencil, X, Tag } from "lucide-react";
+import { Plus, Trash2, CalendarPlus, Pencil, X, Tag, Upload } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -63,6 +63,8 @@ export default function AdminEventsPage() {
   const [form, setForm] = useState(initialForm);
   const [tickets, setTickets] = useState<TicketDraft[]>([{ ...emptyTicket }]);
   const [saving, setSaving] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [events, setEvents] = useState<Event[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
@@ -145,6 +147,27 @@ export default function AdminEventsPage() {
 
   function updateField(key: keyof typeof form, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  async function handleImageUpload(file: File) {
+    setUploadingImage(true);
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || t("admin.uploadFailed"));
+      }
+      updateField("image", data.url);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("admin.uploadFailed"));
+    } finally {
+      setUploadingImage(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
   }
 
   function updateTicket(index: number, key: keyof TicketDraft, value: string) {
@@ -490,12 +513,49 @@ export default function AdminEventsPage() {
               />
             </div>
 
-            <Input
-              label={t("admin.image")}
-              placeholder="/images/my-event.jpg"
-              value={form.image}
-              onChange={(e) => updateField("image", e.target.value)}
-            />
+            <div className="space-y-2">
+              <Input
+                label={t("admin.image")}
+                placeholder="/images/my-event.jpg"
+                value={form.image}
+                onChange={(e) => updateField("image", e.target.value)}
+              />
+              <div className="flex flex-wrap items-center gap-3">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      void handleImageUpload(file);
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  loading={uploadingImage}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  {!uploadingImage && <Upload className="mr-1 h-4 w-4" />}
+                  {uploadingImage ? t("admin.uploading") : t("admin.uploadFromDevice")}
+                </Button>
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {t("admin.uploadHint")}
+                </span>
+              </div>
+              {form.image && (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={form.image}
+                  alt={form.title || t("admin.image")}
+                  className="mt-1 h-40 w-full max-w-sm rounded-lg border border-gray-200 object-cover dark:border-gray-800"
+                />
+              )}
+            </div>
           </CardContent>
         </Card>
 
