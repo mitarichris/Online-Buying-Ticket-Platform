@@ -18,6 +18,7 @@ const categories = [
   { slug: "Conference", key: "home.row.conferences" },
   { slug: "Exhibitions", key: "home.row.expos" },
   { slug: "Comedy", key: "home.row.comedy" },
+  { slug: "Races", key: "home.row.races" },
 ];
 
 export function Header() {

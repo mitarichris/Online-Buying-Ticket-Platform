@@ -19,6 +19,7 @@ const defaultCategories = [
   "Conference",
   "Exhibitions",
   "Comedy",
+  "Races",
 ];
 
 const CUSTOM_CATEGORIES_KEY = "admin:customCategories";

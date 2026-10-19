@@ -165,6 +165,7 @@ interface HomeRows {
   conferences: EventItem[];
   expos: EventItem[];
   comedy: EventItem[];
+  races: EventItem[];
 }
 
 function upcomingOnly<T extends { date: string }>(items: T[]): T[] {
@@ -180,6 +181,7 @@ const staticRows: HomeRows = {
   conferences: upcomingOnly(conferenceEvents),
   expos: upcomingOnly(expoEvents),
   comedy: upcomingOnly(comedyEvents),
+  races: [],
 };
 
 function groupByCategory(events: EventItem[]): HomeRows {
@@ -194,6 +196,7 @@ function groupByCategory(events: EventItem[]): HomeRows {
     conferences: [],
     expos: [],
     comedy: [],
+    races: [],
   };
 
   for (const event of events) {
@@ -205,6 +208,7 @@ function groupByCategory(events: EventItem[]): HomeRows {
     else if (category.startsWith("conference")) rows.conferences.push(event);
     else if (category.startsWith("exhib") || category.startsWith("expo")) rows.expos.push(event);
     else if (category.startsWith("comedy")) rows.comedy.push(event);
+    else if (category.startsWith("race")) rows.races.push(event);
   }
 
   return rows;
@@ -438,6 +442,7 @@ export default function HomePage() {
         {rows.conferences.length > 0 && <ContentRow title={t("home.row.conferences")} events={rows.conferences} />}
         {rows.expos.length > 0 && <ContentRow title={t("home.row.expos")} events={rows.expos} />}
         {rows.comedy.length > 0 && <ContentRow title={t("home.row.comedy")} events={rows.comedy} />}
+        {rows.races.length > 0 && <ContentRow title={t("home.row.races")} events={rows.races} />}
       </div>
 
       <footer className="mt-8 border-t border-gray-200 dark:border-white/10">
