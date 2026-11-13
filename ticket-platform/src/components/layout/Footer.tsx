@@ -39,8 +39,8 @@ export function Footer() {
   return (
     <footer className="border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1.2fr]">
-          <div>
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-2 md:gap-10 lg:grid-cols-[1.5fr_1fr_1fr_1.2fr]">
+          <div className="col-span-2 md:col-span-1">
             <Image
               src="/logo.svg"
               alt="TicketHub"
@@ -126,7 +126,7 @@ export function Footer() {
             </ul>
           </div>
 
-          <div>
+          <div className="col-span-2 md:col-span-1">
             <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
               {t("footer.payments")}
             </h2>

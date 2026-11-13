@@ -636,19 +636,19 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
+        <div className="mt-8 grid grid-cols-3 gap-2 sm:gap-4">
           {steps.map((step, index) => (
             <div
               key={step.title}
-              className="relative rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900"
+              className="relative rounded-2xl border border-slate-200 bg-white p-3 sm:p-6 dark:border-slate-800 dark:bg-slate-900"
             >
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0B1F3A] text-sm font-bold text-white dark:bg-[#C9A227] dark:text-slate-950">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0B1F3A] text-xs font-bold text-white sm:h-10 sm:w-10 sm:text-sm dark:bg-[#C9A227] dark:text-slate-950">
                 {index + 1}
               </span>
-              <h3 className="mt-4 text-base font-semibold text-slate-900 dark:text-white">
+              <h3 className="mt-2 text-xs font-semibold leading-snug text-slate-900 sm:mt-4 sm:text-base dark:text-white">
                 {step.title}
               </h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+              <p className="mt-1 text-[11px] leading-snug text-slate-500 sm:mt-1.5 sm:text-sm sm:leading-relaxed dark:text-slate-400">
                 {step.description}
               </p>
             </div>
@@ -671,17 +671,17 @@ export default function HomePage() {
               {t("home.cta.title")}
             </h2>
             <p className="mt-2 text-sm text-slate-300">{t("home.cta.subtitle")}</p>
-            <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <div className="mt-6 flex flex-row flex-wrap items-center justify-center gap-3">
               <Link
                 href="/events"
-                className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition-colors hover:bg-slate-100 sm:w-auto"
+                className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-white px-3 py-3 text-sm font-semibold text-slate-900 transition-colors hover:bg-slate-100 sm:flex-none sm:px-5"
               >
                 {t("home.cta.button")}
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 href="/guide"
-                className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-white/25 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10 sm:w-auto"
+                className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-white/25 px-3 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10 sm:flex-none sm:px-5"
               >
                 {t("home.cta.guide")}
               </Link>
