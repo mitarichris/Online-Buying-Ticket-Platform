@@ -307,8 +307,8 @@ export default function HomePage() {
         </div>
 
         <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 lg:pb-24 lg:pt-20">
-          <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
-            <div>
+          <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
+            <div className="min-w-0">
               <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/90 backdrop-blur">
                 <Sparkles className="h-3.5 w-3.5 text-[#E7C65B]" />
                 {t("home.hero.badge")}
@@ -348,7 +348,7 @@ export default function HomePage() {
 
             {featuredCount > 0 && (
               <div
-                className="relative mx-auto w-full max-w-md lg:mx-0 lg:ml-auto"
+                className="relative mx-auto w-full min-w-0 max-w-md lg:mx-0 lg:ml-auto"
                 onMouseEnter={() => setCarouselPaused(true)}
                 onMouseLeave={() => setCarouselPaused(false)}
                 onFocus={() => setCarouselPaused(true)}
