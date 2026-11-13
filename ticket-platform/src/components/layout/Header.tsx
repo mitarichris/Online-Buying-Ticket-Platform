@@ -17,6 +17,7 @@ import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { LanguageFlag } from "@/components/layout/LanguageFlag";
+import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import { useLanguage } from "@/i18n/LanguageProvider";
 import { locales } from "@/i18n/translations";
@@ -84,7 +85,21 @@ export function Header() {
           </Link>
 
           <div className="ml-auto flex items-center gap-1 sm:gap-2">
+            <LanguageSwitcher />
             <NotificationBell />
+
+            <Link
+              href="/cart"
+              aria-label={t("nav.cart")}
+              className="relative flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {cartCount > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-bold text-white">
+                  {cartCount > 9 ? "9+" : cartCount}
+                </span>
+              )}
+            </Link>
 
             <button
               onClick={() => setMenuOpen(!menuOpen)}
