@@ -27,3 +27,47 @@ export function formatDate(date: string, locale: string = "en"): string {
     day: "numeric",
   });
 }
+
+export interface DateParts {
+  month: string;
+  day: string;
+  weekday: string;
+}
+
+function toDate(value: string): Date {
+  return /^\d{4}-\d{2}-\d{2}$/.test(value)
+    ? new Date(`${value}T00:00:00`)
+    : new Date(value);
+}
+
+export function getDateParts(date: string, locale: string = "en"): DateParts | null {
+  const parsed = toDate(date);
+  if (Number.isNaN(parsed.getTime())) return null;
+
+  const dateLocale = DATE_LOCALES[locale] ?? "en-US";
+
+  return {
+    month: parsed.toLocaleDateString(dateLocale, { month: "short" }).toUpperCase(),
+    day: parsed.toLocaleDateString(dateLocale, { day: "numeric" }),
+    weekday: parsed.toLocaleDateString(dateLocale, { weekday: "short" }),
+  };
+}
+
+export function getShortDate(date: string, locale: string = "en"): string {
+  const parsed = toDate(date);
+  if (Number.isNaN(parsed.getTime())) return date;
+  return parsed.toLocaleDateString(DATE_LOCALES[locale] ?? "en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+export function getMinPrice(
+  ticketTypes: { price: number }[] | undefined,
+  fallback?: number
+): number | undefined {
+  if (fallback !== undefined) return fallback;
+  if (!ticketTypes || ticketTypes.length === 0) return undefined;
+  return Math.min(...ticketTypes.map((ticket) => ticket.price));
+}

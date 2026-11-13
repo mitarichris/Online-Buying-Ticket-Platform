@@ -14,6 +14,8 @@ interface EventSearchBoxProps {
   placeholder?: string;
   inputClassName?: string;
   autoFocus?: boolean;
+  showSubmitButton?: boolean;
+  submitLabel?: string;
 }
 
 export function EventSearchBox({
@@ -24,6 +26,8 @@ export function EventSearchBox({
   placeholder,
   inputClassName,
   autoFocus,
+  showSubmitButton,
+  submitLabel,
 }: EventSearchBoxProps) {
   const router = useRouter();
   const { t } = useLanguage();
@@ -164,6 +168,15 @@ export function EventSearchBox({
           />
           {loading && (
             <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-gray-400" />
+          )}
+          {showSubmitButton && !loading && (
+            <button
+              type="submit"
+              className="absolute right-1.5 top-1/2 flex -translate-y-1/2 items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 sm:px-4"
+            >
+              <Search className="h-4 w-4" />
+              <span className="hidden sm:inline">{submitLabel ?? t("home.search")}</span>
+            </button>
           )}
         </div>
       </form>

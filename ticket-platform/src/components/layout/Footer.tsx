@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
+import { ShieldCheck } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageProvider";
+import { categories } from "@/lib/categories";
 
 const socials = [
   {
@@ -26,40 +29,136 @@ const socials = [
   },
 ];
 
+const footerCategories = categories.slice(0, 5);
+
 export function Footer() {
   const { t } = useLanguage();
+  const linkClass =
+    "text-sm text-slate-500 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white";
+
   return (
-    <footer className="border-t border-gray-200 bg-white dark:border-white/10 dark:bg-[#101114]">
-      <div className="mx-auto max-w-7xl px-4 py-8">
-        <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
-          <p className="text-sm text-gray-600 dark:text-white/80">
+    <footer className="border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1.2fr]">
+          <div>
+            <Image
+              src="/logo.svg"
+              alt="TicketHub"
+              width={180}
+              height={63}
+              className="h-10 w-auto"
+            />
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+              {t("footer.tagline")}
+            </p>
+            <div className="mt-5 flex items-center gap-2">
+              {socials.map((s) => (
+                <a
+                  key={s.name}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={s.name}
+                  title={s.name}
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-400 transition-colors hover:border-slate-300 hover:text-slate-900 dark:border-slate-800 dark:text-slate-500 dark:hover:border-slate-700 dark:hover:text-white"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+                    <path d={s.path} />
+                  </svg>
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
+              {t("footer.explore")}
+            </h2>
+            <ul className="mt-4 space-y-2.5">
+              <li>
+                <Link href="/events" className={linkClass}>
+                  {t("footer.browse")}
+                </Link>
+              </li>
+              {footerCategories.map((category) => (
+                <li key={category.slug}>
+                  <Link
+                    href={`/events?category=${encodeURIComponent(category.slug)}`}
+                    className={linkClass}
+                  >
+                    {t(category.labelKey)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
+              {t("footer.support")}
+            </h2>
+            <ul className="mt-4 space-y-2.5">
+              <li>
+                <Link href="/orders" className={linkClass}>
+                  {t("footer.myOrders")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/guide" className={linkClass}>
+                  {t("footer.faq")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact-us" className={linkClass}>
+                  {t("footer.contactUs")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/privacy" className={linkClass}>
+                  {t("footer.privacy")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/user-agreement" className={linkClass}>
+                  {t("footer.terms")}
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
+              {t("footer.payments")}
+            </h2>
+            <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
+              <p className="flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-300">
+                <ShieldCheck className="h-4 w-4 text-emerald-500" />
+                {t("footer.paymentNote")}
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] font-bold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                  MTN MoMo
+                </span>
+                <span className="rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] font-bold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                  Airtel Money
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-10 flex flex-col gap-4 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             {t("footer.rights", { year: new Date().getFullYear() })}
           </p>
-          <div className="flex items-center gap-4">
-            {socials.map((s) => (
-              <a
-                key={s.name}
-                href={s.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={s.name}
-                title={s.name}
-                className="flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-gray-900 dark:text-white/50 dark:hover:bg-white/10 dark:hover:text-white"
-              >
-                <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
-                  <path d={s.path} />
-                </svg>
-              </a>
-            ))}
-          </div>
-          <div className="flex gap-6">
-            <Link href="/user-agreement" className="text-sm text-gray-600 hover:text-gray-900 dark:text-white/80 dark:hover:text-white">
+          <div className="flex flex-wrap gap-x-5 gap-y-2">
+            <Link href="/user-agreement" className={linkClass}>
               {t("footer.terms")}
             </Link>
-            <Link href="/privacy" className="text-sm text-gray-600 hover:text-gray-900 dark:text-white/80 dark:hover:text-white">
+            <Link href="/privacy" className={linkClass}>
               {t("footer.privacy")}
             </Link>
-            <Link href="/contact-us" className="text-sm text-gray-600 hover:text-gray-900 dark:text-white/80 dark:hover:text-white">
+            <Link href="/contact-us" className={linkClass}>
               {t("footer.contact")}
             </Link>
           </div>

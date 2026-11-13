@@ -2,119 +2,172 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { ChevronLeft, ChevronRight, Ticket } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  ArrowRight,
+  BadgeCheck,
+  CalendarDays,
+  Headphones,
+  MapPin,
+  ShieldCheck,
+  Sparkles,
+  Ticket,
+  Zap,
+} from "lucide-react";
+import { EventCard, type EventCardEvent } from "@/components/events/EventCard";
+import { EventSearchBox } from "@/components/events/EventSearchBox";
 import { useLanguage } from "@/i18n/LanguageProvider";
+import { categories, matchesCategory } from "@/lib/categories";
 import { isPastEvent } from "@/lib/event-date";
+import { formatCurrency, getDateParts, getMinPrice, getShortDate } from "@/lib/utils";
 
-const featuredSlides = [
+type HomeEvent = EventCardEvent;
+
+const popularEvents: HomeEvent[] = [
   {
-    image: "/images/nba-allstar.jpeg",
+    id: "evt_8",
     title: "NBA All-Star Game",
+    image: "/images/nba-allstar.jpeg",
     date: "Feb 15, 2026",
     genre: "Sports",
-    category: "sports",
+    category: "Sports",
+    venue: "Madison Square Garden",
+    city: "New York",
+    time: "7:00 PM",
+    price: 45000,
   },
   {
-    image: "/images/rock-night-2026.jpg",
+    id: "evt_7",
+    title: "Champions League Finals",
+    image: "/images/champions-league.png",
+    date: "Aug 28, 2026",
+    genre: "Sports",
+    category: "Sports",
+    venue: "Wembley Stadium",
+    city: "London",
+    time: "8:00 PM",
+    price: 120000,
+  },
+  {
+    id: "evt_1",
     title: "Rock Night 2026",
+    image: "/images/rock-night-2026.jpg",
     date: "Sep 5, 2026",
     genre: "Music Festival",
-    category: "festivals",
+    category: "Festivals",
+    venue: "Kigali Arena",
+    city: "Kigali",
+    time: "7:00 PM",
+    price: 65000,
   },
   {
-    image: "/images/broadway-the-phantom.jpg",
+    id: "evt_2",
     title: "The Phantom of the Opera",
+    image: "/images/broadway-the-phantom.jpg",
     date: "Sep 12, 2026",
     genre: "Theater",
-    category: "theater",
+    category: "Theater",
+    venue: "Majestic Theatre",
+    city: "New York",
+    time: "8:00 PM",
+    price: 130000,
   },
   {
-    image: "/images/tech-summit-2026.jpg",
+    id: "evt_3",
     title: "Tech Summit 2026",
+    image: "/images/tech-summit-2026.jpg",
     date: "Oct 1, 2026",
     genre: "Conference",
-    category: "exhibitions",
+    category: "Conference",
+    venue: "Kigali Convention Centre",
+    city: "Kigali",
+    time: "9:00 AM",
+    price: 100000,
   },
   {
-    image: "/images/modern-art-expo.jpg",
+    id: "evt_4",
+    title: "Jazz & Blues Festival",
+    image: "/images/jazz-blues-festival.jpg",
+    date: "Oct 15, 2026",
+    genre: "Music Festival",
+    category: "Festivals",
+    venue: "Grant Park",
+    city: "Chicago",
+    time: "2:00 PM",
+    price: 52000,
+  },
+  {
+    id: "evt_9",
     title: "Modern Art Expo",
+    image: "/images/modern-art-expo.jpg",
     date: "Nov 10, 2026",
     genre: "Expo",
-    category: "exhibitions",
+    category: "Exhibitions",
+    venue: "Kigali Art Gallery",
+    city: "Kigali",
+    time: "10:00 AM",
+    price: 15000,
   },
   {
-    image: "/images/comedy-night-special.jpg",
+    id: "evt_5",
     title: "Comedy Night Special",
+    image: "/images/comedy-night-special.jpg",
     date: "Aug 30, 2026",
     genre: "Comedy Show",
-    category: "comedy",
+    category: "Comedy",
+    venue: "The Comedy Store",
+    city: "Los Angeles",
+    time: "8:30 PM",
+    price: 45500,
   },
-];
-
-interface EventItem {
-  id: string;
-  title: string;
-  image: string;
-  date: string;
-  genre: string;
-  slug: string;
-  category?: string;
-}
-
-const popularEvents: EventItem[] = [
-  { id: "evt_8", title: "NBA All-Star Game", image: "/images/nba-allstar.jpeg", date: "Feb 15, 2026", genre: "Sports", slug: "" },
-  { id: "evt_7", title: "Champions League Finals", image: "/images/champions-league.png", date: "Aug 28, 2026", genre: "Sports", slug: "" },
-  { id: "evt_1", title: "Rock Night 2026", image: "/images/rock-night-2026.jpg", date: "Sep 5, 2026", genre: "Music Festival", slug: "" },
-  { id: "evt_2", title: "The Phantom of the Opera", image: "/images/broadway-the-phantom.jpg", date: "Sep 12, 2026", genre: "Theater", slug: "" },
-  { id: "evt_3", title: "Tech Summit 2026", image: "/images/tech-summit-2026.jpg", date: "Oct 1, 2026", genre: "Conference", slug: "" },
-  { id: "evt_4", title: "Jazz & Blues Festival", image: "/images/jazz-blues-festival.jpg", date: "Oct 15, 2026", genre: "Music Festival", slug: "" },
-  { id: "evt_9", title: "Modern Art Expo", image: "/images/modern-art-expo.jpg", date: "Nov 10, 2026", genre: "Expo", slug: "" },
-  { id: "evt_5", title: "Comedy Night Special", image: "/images/comedy-night-special.jpg", date: "Aug 30, 2026", genre: "Comedy Show", slug: "" },
-  { id: "evt_6", title: "Electronic Music Festival", image: "/images/electronic-music-festival.jpg", date: "Dec 1, 2026", genre: "Music Festival", slug: "" },
-  { id: "evt_10", title: "Auto Show 2026", image: "/images/auto-show.jpg", date: "Dec 5, 2026", genre: "Expo", slug: "" },
-];
-
-const sportsEvents: EventItem[] = [
-  { id: "evt_8", title: "NBA All-Star Game", image: "/images/nba-allstar.jpeg", date: "Feb 15, 2026", genre: "Sports", slug: "" },
-  { id: "evt_7", title: "Champions League Finals", image: "/images/champions-league.png", date: "Aug 28, 2026", genre: "Sports", slug: "" },
-];
-
-const musicEvents: EventItem[] = [
-  { id: "evt_1", title: "Rock Night 2026", image: "/images/rock-night-2026.jpg", date: "Sep 5, 2026", genre: "Music Festival", slug: "" },
-  { id: "evt_4", title: "Jazz & Blues Festival", image: "/images/jazz-blues-festival.jpg", date: "Oct 15, 2026", genre: "Music Festival", slug: "" },
-  { id: "evt_6", title: "Electronic Music Festival", image: "/images/electronic-music-festival.jpg", date: "Dec 1, 2026", genre: "Music Festival", slug: "" },
-];
-
-const theaterEvents: EventItem[] = [
-  { id: "evt_2", title: "The Phantom of the Opera", image: "/images/broadway-the-phantom.jpg", date: "Sep 12, 2026", genre: "Theater", slug: "" },
-  { id: "evt_16", title: "Hamlet: A Modern Retelling", image: "/images/hamlet-modern.svg", date: "Nov 14, 2026", genre: "Theater", slug: "" },
-  { id: "evt_17", title: "The Lion King on Stage", image: "/images/lion-king-stage.svg", date: "Jan 22, 2027", genre: "Theater", slug: "" },
-];
-
-const conferenceEvents: EventItem[] = [
-  { id: "evt_3", title: "Tech Summit 2026", image: "/images/tech-summit-2026.jpg", date: "Oct 1, 2026", genre: "Conference", slug: "" },
-  { id: "evt_18", title: "Africa Tech Conference 2027", image: "/images/africa-tech-conference.svg", date: "Mar 10, 2027", genre: "Conference", slug: "" },
-  { id: "evt_19", title: "Global Health Forum", image: "/images/global-health-forum.svg", date: "Apr 5, 2027", genre: "Conference", slug: "" },
-];
-
-const expoEvents: EventItem[] = [
-  { id: "evt_9", title: "Modern Art Expo", image: "/images/modern-art-expo.jpg", date: "Nov 10, 2026", genre: "Expo", slug: "" },
-  { id: "evt_10", title: "Auto Show 2026", image: "/images/auto-show.jpg", date: "Dec 5, 2026", genre: "Expo", slug: "" },
-];
-
-const comedyEvents: EventItem[] = [
-  { id: "evt_5", title: "Comedy Night Special", image: "/images/comedy-night-special.jpg", date: "Aug 30, 2026", genre: "Comedy Show", slug: "" },
-  { id: "evt_20", title: "Laugh Out Loud Rwanda", image: "/images/laugh-out-loud-rwanda.svg", date: "Oct 30, 2026", genre: "Comedy Show", slug: "" },
-  { id: "evt_21", title: "The Big Gig: Comedy Festival", image: "/images/the-big-gig.svg", date: "Feb 12, 2027", genre: "Comedy Show", slug: "" },
-];
-
-const moviesEvents: EventItem[] = [
-  { id: "evt_11", title: "Avengers: Doomsday", image: "/images/avengers-doomsday.jpg", date: "Dec 18, 2026", genre: "Superhero", slug: "" },
-  { id: "evt_12", title: "The Odyssey (IMAX)", image: "/images/the-odyssey.jpg", date: "Nov 6, 2026", genre: "Epic", slug: "" },
-  { id: "evt_13", title: "Toy Story 5", image: "/images/toy-story-5.jpg", date: "Nov 20, 2026", genre: "Family", slug: "" },
-  { id: "evt_14", title: "Moana", image: "/images/moana.jpg", date: "Dec 4, 2026", genre: "Adventure", slug: "" },
-  { id: "evt_15", title: "Star Wars: The Mandalorian and Grogu", image: "/images/mandalorian-and-grogu.jpg", date: "Dec 11, 2026", genre: "Sci-Fi", slug: "" },
+  {
+    id: "evt_6",
+    title: "Electronic Music Festival",
+    image: "/images/electronic-music-festival.jpg",
+    date: "Dec 1, 2026",
+    genre: "Music Festival",
+    category: "Festivals",
+    venue: "Kigali Arena",
+    city: "Kigali",
+    time: "12:00 PM",
+    price: 260000,
+  },
+  {
+    id: "evt_10",
+    title: "Auto Show 2026",
+    image: "/images/auto-show.jpg",
+    date: "Dec 5, 2026",
+    genre: "Expo",
+    category: "Exhibitions",
+    venue: "Kigali Convention Centre",
+    city: "Kigali",
+    time: "10:00 AM",
+    price: 20000,
+  },
+  {
+    id: "evt_11",
+    title: "Avengers: Doomsday",
+    image: "/images/avengers-doomsday.jpg",
+    date: "Dec 18, 2026",
+    genre: "Superhero",
+    category: "Movies",
+    venue: "Canal Olympia",
+    city: "Kigali",
+    time: "6:30 PM",
+    price: 12000,
+  },
+  {
+    id: "evt_14",
+    title: "Moana",
+    image: "/images/moana.jpg",
+    date: "Dec 4, 2026",
+    genre: "Adventure",
+    category: "Movies",
+    venue: "Canal Olympia",
+    city: "Kigali",
+    time: "4:00 PM",
+    price: 10000,
+  },
 ];
 
 interface ApiEvent {
@@ -124,219 +177,33 @@ interface ApiEvent {
   date: string;
   genre?: string | null;
   image?: string | null;
+  time?: string;
+  venue?: string;
+  city?: string;
+  ticketTypes?: { price: number }[];
 }
 
-const MONTHS = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-];
-
-function formatEventDate(value: string): string {
-  const parts = value.split("-");
-  if (parts.length === 3) {
-    const year = Number(parts[0]);
-    const month = MONTHS[Number(parts[1]) - 1];
-    const day = Number(parts[2]);
-    if (month && !Number.isNaN(year) && !Number.isNaN(day)) {
-      return `${month} ${day}, ${year}`;
-    }
-  }
-  return value;
-}
-
-function toCardItem(event: ApiEvent): EventItem {
+function toCardItem(event: ApiEvent): HomeEvent {
   return {
     id: event.id,
     title: event.title,
     image: event.image || "/images/hero-bg.png",
-    date: formatEventDate(event.date),
+    date: event.date,
     genre: event.genre || event.category || "",
-    slug: "",
     category: event.category,
+    time: event.time,
+    venue: event.venue,
+    city: event.city,
+    ticketTypes: event.ticketTypes,
   };
 }
 
-interface HomeRows {
-  popular: EventItem[];
-  movies: EventItem[];
-  sports: EventItem[];
-  music: EventItem[];
-  theater: EventItem[];
-  conferences: EventItem[];
-  expos: EventItem[];
-  comedy: EventItem[];
-  races: EventItem[];
-}
-
-function upcomingOnly<T extends { date: string }>(items: T[]): T[] {
-  return items.filter((item) => !isPastEvent(item.date));
-}
-
-const staticRows: HomeRows = {
-  popular: upcomingOnly(popularEvents),
-  movies: upcomingOnly(moviesEvents),
-  sports: upcomingOnly(sportsEvents),
-  music: upcomingOnly(musicEvents),
-  theater: upcomingOnly(theaterEvents),
-  conferences: upcomingOnly(conferenceEvents),
-  expos: upcomingOnly(expoEvents),
-  comedy: upcomingOnly(comedyEvents),
-  races: [],
-};
-
-function groupByCategory(events: EventItem[]): HomeRows {
-  if (events.length === 0) return staticRows;
-
-  const rows: HomeRows = {
-    popular: events.slice(0, 12),
-    movies: [],
-    sports: [],
-    music: [],
-    theater: [],
-    conferences: [],
-    expos: [],
-    comedy: [],
-    races: [],
-  };
-
-  for (const event of events) {
-    const category = (event.category || "").toLowerCase();
-    if (category.startsWith("movie")) rows.movies.push(event);
-    else if (category.startsWith("sport")) rows.sports.push(event);
-    else if (category.startsWith("festival") || category.startsWith("music")) rows.music.push(event);
-    else if (category.startsWith("theat")) rows.theater.push(event);
-    else if (category.startsWith("conference")) rows.conferences.push(event);
-    else if (category.startsWith("exhib") || category.startsWith("expo")) rows.expos.push(event);
-    else if (category.startsWith("comedy")) rows.comedy.push(event);
-    else if (category.startsWith("race")) rows.races.push(event);
-  }
-
-  return rows;
-}
-
-function EventCard({ event }: { event: EventItem }) {
-  const { t } = useLanguage();
-  return (
-    <Link href={`/events/${event.id}`} className="group flex-shrink-0 w-[140px] sm:w-[160px] md:w-[180px]">
-      <div className="relative overflow-hidden rounded-lg">
-        <div className="aspect-[5/7] relative bg-[#2b2e39] overflow-hidden">
-          <Image
-            src={event.image}
-            alt={event.title}
-            fill
-            loading="eager"
-            unoptimized
-            sizes="(max-width: 640px) 140px, (max-width: 768px) 160px, 180px"
-            className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          <div className="absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="flex items-center gap-1 rounded bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white w-fit">
-              <Ticket className="h-3 w-3" />
-              {t("home.bookNow")}
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="mt-1 px-0.5">
-        <p className="text-xs text-gray-900 truncate dark:text-white">{event.title}</p>
-        <p className="text-[11px] text-gray-500 dark:text-white/70">{event.genre} &middot; {event.date}</p>
-      </div>
-    </Link>
-  );
-}
-
-function ContentRow({ title, events }: { title: string; events: EventItem[] }) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const { t } = useLanguage();
-
-  const scroll = (direction: "left" | "right") => {
-    if (scrollRef.current) {
-      const scrollAmount = scrollRef.current.offsetWidth * 0.75;
-      scrollRef.current.scrollBy({
-        left: direction === "right" ? scrollAmount : -scrollAmount,
-        behavior: "smooth",
-      });
-    }
-  };
-
-  return (
-    <article className="mb-8 md:mb-10">
-      <div className="flex items-center justify-between px-4 md:px-5 mb-3">
-        <h2 className="text-base md:text-lg font-bold text-gray-900 dark:text-white">{title}</h2>
-        <Link href="/events" className="flex items-center gap-1 text-xs text-gray-500 transition-colors hover:text-gray-900 dark:text-white/60 dark:hover:text-white">
-          {t("home.more")}
-          <ChevronRight className="h-3 w-3" />
-        </Link>
-      </div>
-      <div className="relative group/row">
-        <div
-          ref={scrollRef}
-          className="flex gap-3 overflow-x-auto scrollbar-hide px-4 md:px-5 pb-2"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-        >
-          {events.map((event) => (
-            <EventCard key={event.id + event.title} event={event} />
-          ))}
-        </div>
-        <button
-          onClick={() => scroll("left")}
-          className="absolute left-1 top-1/3 -translate-y-1/2 z-10 hidden md:flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white opacity-0 group-hover/row:opacity-100 transition-opacity hover:bg-black/80 cursor-pointer"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </button>
-        <button
-          onClick={() => scroll("right")}
-          className="absolute right-1 top-1/3 -translate-y-1/2 z-10 hidden md:flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white opacity-0 group-hover/row:opacity-100 transition-opacity hover:bg-black/80 cursor-pointer"
-        >
-          <ChevronRight className="h-5 w-5" />
-        </button>
-      </div>
-    </article>
-  );
-}
+const fallbackEvents = popularEvents.filter((event) => !isPastEvent(event.date));
 
 export default function HomePage() {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-  const [dbEvents, setDbEvents] = useState<EventItem[]>([]);
+  const [dbEvents, setDbEvents] = useState<HomeEvent[]>([]);
+  const [activeCategory, setActiveCategory] = useState("all");
   const { t } = useLanguage();
-
-  const heroSlides = useMemo(() => {
-    if (dbEvents.length > 0) {
-      return dbEvents.slice(0, 6).map((event) => ({
-        image: event.image,
-        title: event.title,
-        date: event.date,
-        genre: event.genre,
-        category: event.category ?? "",
-      }));
-    }
-    const fallback = upcomingOnly(featuredSlides);
-    return fallback.length > 0 ? fallback : featuredSlides;
-  }, [dbEvents]);
-
-  const nextSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev + 1) % Math.max(heroSlides.length, 1));
-  }, [heroSlides.length]);
-
-  const prevSlide = useCallback(() => {
-    setCurrentSlide(
-      (prev) => (prev - 1 + Math.max(heroSlides.length, 1)) % Math.max(heroSlides.length, 1)
-    );
-  }, [heroSlides.length]);
-
-  const goToSlide = useCallback((index: number) => {
-    setCurrentSlide(index);
-    setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 10000);
-  }, []);
-
-  useEffect(() => {
-    if (!isAutoPlaying) return;
-    const interval = setInterval(nextSlide, 4000);
-    return () => clearInterval(interval);
-  }, [isAutoPlaying, nextSlide]);
 
   useEffect(() => {
     let active = true;
@@ -355,115 +222,407 @@ export default function HomePage() {
     };
   }, []);
 
-  const rows = useMemo(() => groupByCategory(dbEvents), [dbEvents]);
+  const allEvents = useMemo(
+    () => (dbEvents.length > 0 ? dbEvents : fallbackEvents),
+    [dbEvents]
+  );
 
-  const activeSlide = heroSlides.length > 0 ? currentSlide % heroSlides.length : 0;
-  const slide = heroSlides[activeSlide];
+  const categoryCounts = useMemo(() => {
+    return categories.reduce<Record<string, number>>((counts, category) => {
+      counts[category.slug] = allEvents.filter((event) =>
+        matchesCategory(event.category, event.genre, category.slug)
+      ).length;
+      return counts;
+    }, {});
+  }, [allEvents]);
+
+  const upcoming = useMemo(() => {
+    if (activeCategory === "all") return allEvents;
+    return allEvents.filter((event) =>
+      matchesCategory(event.category, event.genre, activeCategory)
+    );
+  }, [allEvents, activeCategory]);
+
+  const featured = allEvents[0];
+  const featuredDate = featured ? getDateParts(featured.date) : null;
+  const featuredPrice = featured
+    ? getMinPrice(featured.ticketTypes, featured.price)
+    : undefined;
+
+  const benefits = [
+    {
+      icon: ShieldCheck,
+      title: t("home.why.secure.title"),
+      description: t("home.why.secure.desc"),
+      tint: "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400",
+    },
+    {
+      icon: Zap,
+      title: t("home.why.instant.title"),
+      description: t("home.why.instant.desc"),
+      tint: "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400",
+    },
+    {
+      icon: BadgeCheck,
+      title: t("home.why.verified.title"),
+      description: t("home.why.verified.desc"),
+      tint: "bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400",
+    },
+    {
+      icon: Headphones,
+      title: t("home.why.support.title"),
+      description: t("home.why.support.desc"),
+      tint: "bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400",
+    },
+  ];
+
+  const steps = [
+    { title: t("home.how.s1.title"), description: t("home.how.s1.desc") },
+    { title: t("home.how.s2.title"), description: t("home.how.s2.desc") },
+    { title: t("home.how.s3.title"), description: t("home.how.s3.desc") },
+  ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#101114]">
-      <section className="relative w-full h-[200px] sm:h-[260px] md:h-[320px] lg:h-[400px] overflow-hidden">
-        {heroSlides.map((s, index) => (
-          <div
-            key={index}
-            className={`absolute inset-0 overflow-hidden transition-opacity duration-500 ${
-              index === activeSlide ? "opacity-100 z-[1]" : "opacity-0 z-0"
-            }`}
-          >
-            <Image
-              src={s.image}
-              alt={s.title}
-              fill
-              sizes="100vw"
-              className="absolute inset-0 h-full w-full object-cover object-center"
-              priority={index === 0}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#101114] via-[#101114]/30 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-b from-[#101114]/60 via-transparent to-transparent h-20" />
-          </div>
-        ))}
-
-        <div className="absolute bottom-0 left-0 right-0 z-10 p-4 pb-16 md:p-6 md:pb-12">
-          <div className="max-w-7xl mx-auto flex items-end justify-between">
-            <div>
-              <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold text-white leading-tight">
-                {slide.title}
-              </h2>
-              <div className="flex items-center gap-2 mt-1.5 text-xs md:text-sm text-white/70">
-                <span>{slide.genre}</span>
-                <span className="w-px h-3 bg-white/30" />
-                <span>{slide.date}</span>
-              </div>
-            </div>
-            <Link
-              href={`/events?category=${slide.category}`}
-              className="flex items-center gap-2 rounded bg-blue-600 px-4 py-2 md:px-5 md:py-2.5 text-xs md:text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
-            >
-              <Ticket className="h-4 w-4" />
-              {t("home.bookNow")}
-            </Link>
-          </div>
+    <div className="bg-slate-50 dark:bg-[#0b0d12]">
+      <section className="relative overflow-hidden bg-[#0B1F3A]">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -left-24 -top-24 h-80 w-80 rounded-full bg-blue-500/20 blur-3xl" />
+          <div className="absolute -bottom-40 right-0 h-96 w-96 rounded-full bg-[#C9A227]/10 blur-3xl" />
         </div>
 
-        <button
-          onClick={prevSlide}
-          className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 flex h-8 w-8 md:h-10 md:w-10 items-center justify-center rounded-full bg-black/50 text-white transition hover:bg-black/70 cursor-pointer"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </button>
-        <button
-          onClick={nextSlide}
-          className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 flex h-8 w-8 md:h-10 md:w-10 items-center justify-center rounded-full bg-black/50 text-white transition hover:bg-black/70 cursor-pointer"
-        >
-          <ChevronRight className="h-5 w-5" />
-        </button>
+        <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 lg:pb-24 lg:pt-20">
+          <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
+            <div>
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/90 backdrop-blur">
+                <Sparkles className="h-3.5 w-3.5 text-[#E7C65B]" />
+                {t("home.hero.badge")}
+              </span>
 
-        <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 z-20 flex gap-1.5">
-          {heroSlides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goToSlide(index)}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                index === activeSlide
-                  ? "w-6 bg-gradient-to-r from-[#0F172A] to-[#D4AF37]"
-                  : "w-2 bg-white/40 hover:bg-white/60"
-              }`}
-            />
+              <h1 className="mt-5 max-w-xl text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
+                {t("home.hero.title")}
+              </h1>
+              <p className="mt-4 max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base">
+                {t("home.hero.subtitle")}
+              </p>
+
+              <div className="mt-7 max-w-xl">
+                <EventSearchBox
+                  placeholder={t("home.searchHint")}
+                  showSubmitButton
+                  submitLabel={t("home.search")}
+                  inputClassName="w-full rounded-xl border border-transparent bg-white py-3.5 pl-10 pr-14 text-sm text-slate-900 shadow-lg placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 sm:pr-32"
+                />
+              </div>
+
+              <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-medium text-slate-300">
+                <span className="inline-flex items-center gap-1.5">
+                  <ShieldCheck className="h-4 w-4 text-emerald-400" />
+                  {t("home.why.secure.title")}
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Zap className="h-4 w-4 text-amber-300" />
+                  {t("home.why.instant.title")}
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Ticket className="h-4 w-4 text-sky-300" />
+                  {t("home.trust.mobile")}
+                </span>
+              </div>
+            </div>
+
+            {featured && (
+              <div className="relative mx-auto w-full max-w-md lg:mx-0 lg:ml-auto">
+                <div className="absolute -inset-3 rounded-[2rem] bg-white/5" />
+                <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white shadow-2xl dark:bg-slate-900">
+                  <div className="relative aspect-[16/10] overflow-hidden bg-slate-100 dark:bg-slate-800">
+                    <Image
+                      src={featured.image || "/images/hero-bg.png"}
+                      alt={featured.title}
+                      fill
+                      priority
+                      unoptimized
+                      sizes="(max-width: 1024px) 100vw, 420px"
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 via-transparent to-transparent" />
+                    <span className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-[11px] font-semibold text-slate-800 backdrop-blur">
+                      {t("home.featured")}
+                    </span>
+                    {featuredDate && (
+                      <div className="absolute bottom-3 left-3 flex h-14 w-14 flex-col items-center justify-center rounded-xl bg-white text-center shadow-lg">
+                        <span className="text-[10px] font-bold uppercase tracking-wide text-rose-600">
+                          {featuredDate.month}
+                        </span>
+                        <span className="text-xl font-extrabold leading-none text-slate-900">
+                          {featuredDate.day}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="p-4 sm:p-5">
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400">
+                      {featured.genre || featured.category}
+                    </p>
+                    <h2 className="mt-1 line-clamp-1 text-xl font-bold text-slate-900 dark:text-white">
+                      {featured.title}
+                    </h2>
+                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-500 dark:text-slate-400">
+                      <span className="inline-flex items-center gap-1.5">
+                        <CalendarDays className="h-4 w-4" />
+                        {getShortDate(featured.date)}
+                      </span>
+                      {featured.venue && (
+                        <span className="inline-flex items-center gap-1.5">
+                          <MapPin className="h-4 w-4" />
+                          {featured.venue}
+                          {featured.city ? `, ${featured.city}` : ""}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-between gap-3 border-t border-slate-100 pt-4 dark:border-slate-800">
+                      <div>
+                        {featuredPrice !== undefined ? (
+                          <>
+                            <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                              {t("event.fromLabel")}
+                            </p>
+                            <p className="text-lg font-bold text-slate-900 dark:text-white">
+                              {formatCurrency(featuredPrice)}
+                            </p>
+                          </>
+                        ) : (
+                          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                            {t("home.currencyNote")}
+                          </p>
+                        )}
+                      </div>
+                      <Link
+                        href={`/events/${featured.id}`}
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+                      >
+                        {t("home.getTickets")}
+                        <ArrowRight className="h-4 w-4" />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      <section className="relative z-10 mx-auto -mt-8 max-w-7xl px-4 sm:px-6">
+        <div className="grid grid-cols-2 gap-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl sm:grid-cols-4 sm:gap-3 lg:grid-cols-8 dark:border-slate-800 dark:bg-slate-900">
+          {categories.map((category) => {
+            const Icon = category.icon;
+            const count = categoryCounts[category.slug] ?? 0;
+            return (
+              <Link
+                key={category.slug}
+                href={`/events?category=${encodeURIComponent(category.slug)}`}
+                className="group flex flex-col items-center gap-2 rounded-xl px-2 py-3 text-center transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/60"
+              >
+                <span
+                  className={`flex h-11 w-11 items-center justify-center rounded-xl ${category.tint}`}
+                >
+                  <Icon className="h-5 w-5" />
+                </span>
+                <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">
+                  {t(category.labelKey)}
+                </span>
+                {count > 0 && (
+                  <span className="text-[10px] text-slate-400 dark:text-slate-500">
+                    {t("home.eventCount", { count })}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl dark:text-white">
+              {t("home.upcoming.title")}
+            </h2>
+            <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">
+              {t("home.upcoming.subtitle")}
+            </p>
+          </div>
+          <Link
+            href="/events"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400"
+          >
+            {t("home.viewAll")}
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+
+        <div className="mt-5 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+          <button
+            type="button"
+            onClick={() => setActiveCategory("all")}
+            className={`shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+              activeCategory === "all"
+                ? "border-blue-600 bg-blue-600 text-white"
+                : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+            }`}
+          >
+            {t("home.allCategories")}
+          </button>
+          {categories.map((category) => {
+            const active = activeCategory === category.slug;
+            return (
+              <button
+                key={category.slug}
+                type="button"
+                onClick={() => setActiveCategory(category.slug)}
+                className={`shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+                  active
+                    ? "border-blue-600 bg-blue-600 text-white"
+                    : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+                }`}
+              >
+                {t(category.labelKey)}
+              </button>
+            );
+          })}
+        </div>
+
+        {upcoming.length > 0 ? (
+          <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {upcoming.slice(0, 9).map((event) => (
+              <EventCard key={event.id} event={event} />
+            ))}
+          </div>
+        ) : (
+          <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center dark:border-slate-700 dark:bg-slate-900">
+            <CalendarDays className="mx-auto h-10 w-10 text-slate-300 dark:text-slate-600" />
+            <p className="mt-3 text-sm font-medium text-slate-600 dark:text-slate-300">
+              {t("home.empty")}
+            </p>
+            <Link
+              href="/events"
+              className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+            >
+              {t("home.viewAll")}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        )}
+      </section>
+
+      <section className="border-y border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl dark:text-white">
+              {t("home.why.title")}
+            </h2>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+              {t("home.why.subtitle")}
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {benefits.map((benefit) => {
+              const Icon = benefit.icon;
+              return (
+                <div
+                  key={benefit.title}
+                  className="rounded-2xl border border-slate-200 bg-slate-50/60 p-5 dark:border-slate-800 dark:bg-slate-800/40"
+                >
+                  <span
+                    className={`flex h-11 w-11 items-center justify-center rounded-xl ${benefit.tint}`}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <h3 className="mt-4 text-sm font-semibold text-slate-900 dark:text-white">
+                    {benefit.title}
+                  </h3>
+                  <p className="mt-1.5 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                    {benefit.description}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl dark:text-white">
+            {t("home.how.title")}
+          </h2>
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+            {t("home.how.subtitle")}
+          </p>
+        </div>
+
+        <div className="mt-8 grid gap-4 md:grid-cols-3">
+          {steps.map((step, index) => (
+            <div
+              key={step.title}
+              className="relative rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900"
+            >
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0B1F3A] text-sm font-bold text-white dark:bg-[#C9A227] dark:text-slate-950">
+                {index + 1}
+              </span>
+              <h3 className="mt-4 text-base font-semibold text-slate-900 dark:text-white">
+                {step.title}
+              </h3>
+              <p className="mt-1.5 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                {step.description}
+              </p>
+            </div>
           ))}
         </div>
       </section>
 
-      <div className="mt-6 md:mt-8">
-        {rows.popular.length > 0 && <ContentRow title={t("home.row.popular")} events={rows.popular} />}
-        {rows.movies.length > 0 && <ContentRow title={t("home.row.movies")} events={rows.movies} />}
-        {rows.sports.length > 0 && <ContentRow title={t("home.row.sports")} events={rows.sports} />}
-        {rows.music.length > 0 && <ContentRow title={t("home.row.music")} events={rows.music} />}
-        {rows.theater.length > 0 && <ContentRow title={t("home.row.theater")} events={rows.theater} />}
-        {rows.conferences.length > 0 && <ContentRow title={t("home.row.conferences")} events={rows.conferences} />}
-        {rows.expos.length > 0 && <ContentRow title={t("home.row.expos")} events={rows.expos} />}
-        {rows.comedy.length > 0 && <ContentRow title={t("home.row.comedy")} events={rows.comedy} />}
-        {rows.races.length > 0 && <ContentRow title={t("home.row.races")} events={rows.races} />}
-      </div>
-
-      <footer className="mt-8 border-t border-gray-200 dark:border-white/10">
-        <div className="max-w-7xl mx-auto px-4 py-6 md:py-8 text-center">
-          <p className="text-xs leading-5 text-gray-600 dark:text-white/80">
-            {t("home.disclaimer")}
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mt-4 text-xs font-bold text-gray-700 dark:text-white/80">
-            <span>{t("home.about")}</span>
-            <Link href="/events" className="transition-colors hover:text-[#B8942E] dark:hover:text-white">{t("home.browseEvents")}</Link>
-            <span className="h-3 w-px bg-gray-300 hidden sm:block dark:bg-white/30" />
-            <Link href="/register" className="transition-colors hover:text-[#B8942E] dark:hover:text-white">{t("home.createAccount")}</Link>
-            <span className="h-3 w-px bg-gray-300 hidden sm:block dark:bg-white/30" />
-            <Link href="/privacy" className="transition-colors hover:text-[#B8942E] dark:hover:text-white">{t("home.privacy")}</Link>
-            <span className="h-3 w-px bg-gray-300 hidden sm:block dark:bg-white/30" />
-            <Link href="/user-agreement" className="transition-colors hover:text-[#B8942E] dark:hover:text-white">{t("home.agreement")}</Link>
-            <span className="h-3 w-px bg-gray-300 hidden sm:block dark:bg-white/30" />
-            <Link href="/contact-us" className="transition-colors hover:text-[#B8942E] dark:hover:text-white">{t("home.contact")}</Link>
+      <section className="mx-auto max-w-7xl px-4 pb-14 sm:px-6">
+        <div className="relative overflow-hidden rounded-3xl bg-[#0B1F3A] px-6 py-12 text-center sm:px-12">
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl" />
+            <div className="absolute -bottom-24 right-0 h-72 w-72 rounded-full bg-[#C9A227]/15 blur-3xl" />
+          </div>
+          <div className="relative mx-auto max-w-2xl">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/90">
+              <Ticket className="h-3.5 w-3.5 text-[#E7C65B]" />
+              TicketHub
+            </span>
+            <h2 className="mt-4 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+              {t("home.cta.title")}
+            </h2>
+            <p className="mt-2 text-sm text-slate-300">{t("home.cta.subtitle")}</p>
+            <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Link
+                href="/events"
+                className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition-colors hover:bg-slate-100 sm:w-auto"
+              >
+                {t("home.cta.button")}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/guide"
+                className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-white/25 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10 sm:w-auto"
+              >
+                {t("home.cta.guide")}
+              </Link>
+            </div>
           </div>
         </div>
-      </footer>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6">
+        <p className="text-center text-xs leading-5 text-slate-400 dark:text-slate-500">
+          {t("home.disclaimer")}
+        </p>
+      </section>
     </div>
   );
 }

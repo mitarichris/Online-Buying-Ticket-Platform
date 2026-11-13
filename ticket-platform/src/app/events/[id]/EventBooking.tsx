@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Ticket as TicketIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { TicketTypeSelector } from "@/components/tickets/TicketTypeSelector";
@@ -68,9 +69,16 @@ export function EventBooking({ event }: { event: Event }) {
   }
 
   return (
-    <Card>
+    <Card className="overflow-hidden border-slate-200 shadow-sm dark:border-slate-800">
       <CardContent className="p-6">
-        <h2 className="mb-6 text-xl font-semibold text-gray-900">{t("event.selectTickets")}</h2>
+        <div className="mb-6 flex items-center gap-2">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
+            <TicketIcon className="h-4 w-4" />
+          </span>
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+            {t("event.selectTickets")}
+          </h2>
+        </div>
         <div className="space-y-4">
           {event.ticketTypes.map((ticket) => (
             <TicketTypeSelector
@@ -83,17 +91,17 @@ export function EventBooking({ event }: { event: Event }) {
         </div>
 
         {totalItems > 0 && (
-          <div className="mt-6 border-t border-gray-200 pt-6">
+          <div className="mt-6 border-t border-slate-200 pt-6 dark:border-slate-800">
             <div className="mb-4 flex items-center justify-between text-lg">
-              <span className="font-semibold text-gray-900">{t("event.totalTickets", { count: totalItems })}</span>
-              <span className="font-bold text-gray-900 dark:text-white">{formatCurrency(totalPrice)}</span>
+              <span className="font-semibold text-slate-900 dark:text-white">{t("event.totalTickets", { count: totalItems })}</span>
+              <span className="font-bold text-slate-900 dark:text-white">{formatCurrency(totalPrice)}</span>
             </div>
           </div>
         )}
 
         <Button
           size="lg"
-          className="mt-6 w-full"
+          className="mt-6 w-full bg-blue-600 text-white hover:bg-blue-700"
           onClick={handleProceedToPayment}
           disabled={totalItems === 0}
         >

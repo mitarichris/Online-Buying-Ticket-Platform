@@ -8,6 +8,7 @@ import { signOut } from "next-auth/react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChangePasswordForm } from "@/components/account/ChangePasswordForm";
+import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import { useTheme } from "@/components/theme-provider";
 import { toast } from "sonner";
 import { useLanguage } from "@/i18n/LanguageProvider";
@@ -260,13 +261,7 @@ export default function SettingsPage() {
           <CardContent className="space-y-3">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-gray-900 dark:text-white">{t("settings.language")}</p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => toast.info(t("settings.languageSoon"))}
-              >
-                English
-              </Button>
+              <LanguageSwitcher />
             </div>
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-gray-900 dark:text-white">{t("settings.currency")}</p>
