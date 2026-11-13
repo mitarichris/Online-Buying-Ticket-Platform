@@ -6,6 +6,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { UpcomingEventPopup } from "@/components/layout/UpcomingEventPopup";
+import { WelcomeSplash } from "@/components/layout/WelcomeSplash";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,6 +31,7 @@ export default function RootLayout({
           </div>
           <MobileBottomNav />
           <UpcomingEventPopup />
+          <WelcomeSplash />
         </Providers>
       </body>
     </html>
