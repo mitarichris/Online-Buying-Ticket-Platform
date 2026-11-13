@@ -7,6 +7,8 @@ import {
   ArrowRight,
   BadgeCheck,
   CalendarDays,
+  ChevronLeft,
+  ChevronRight,
   Headphones,
   MapPin,
   ShieldCheck,
@@ -243,11 +245,25 @@ export default function HomePage() {
     );
   }, [allEvents, activeCategory]);
 
-  const featured = allEvents[0];
-  const featuredDate = featured ? getDateParts(featured.date) : null;
-  const featuredPrice = featured
-    ? getMinPrice(featured.ticketTypes, featured.price)
-    : undefined;
+  const featuredEvents = useMemo(() => allEvents.slice(0, 5), [allEvents]);
+  const featuredCount = featuredEvents.length;
+  const [slide, setSlide] = useState(0);
+  const [carouselPaused, setCarouselPaused] = useState(false);
+
+  useEffect(() => {
+    if (featuredCount <= 1 || carouselPaused) return;
+    const timer = setInterval(() => {
+      setSlide((current) => (current + 1) % featuredCount);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [featuredCount, carouselPaused, slide]);
+
+  const safeSlide = featuredCount > 0 ? slide % featuredCount : 0;
+
+  function goToSlide(index: number) {
+    if (featuredCount === 0) return;
+    setSlide(((index % featuredCount) + featuredCount) % featuredCount);
+  }
 
   const benefits = [
     {
@@ -330,84 +346,140 @@ export default function HomePage() {
               </div>
             </div>
 
-            {featured && (
-              <div className="relative mx-auto w-full max-w-md lg:mx-0 lg:ml-auto">
+            {featuredCount > 0 && (
+              <div
+                className="relative mx-auto w-full max-w-md lg:mx-0 lg:ml-auto"
+                onMouseEnter={() => setCarouselPaused(true)}
+                onMouseLeave={() => setCarouselPaused(false)}
+                onFocus={() => setCarouselPaused(true)}
+                onBlur={() => setCarouselPaused(false)}
+              >
                 <div className="absolute -inset-3 rounded-[2rem] bg-white/5" />
                 <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white shadow-2xl dark:bg-slate-900">
-                  <div className="relative aspect-[16/10] overflow-hidden bg-slate-100 dark:bg-slate-800">
-                    <Image
-                      src={featured.image || "/images/hero-bg.png"}
-                      alt={featured.title}
-                      fill
-                      priority
-                      unoptimized
-                      sizes="(max-width: 1024px) 100vw, 420px"
-                      className="object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 via-transparent to-transparent" />
-                    <span className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-[11px] font-semibold text-slate-800 backdrop-blur">
-                      {t("home.featured")}
-                    </span>
-                    {featuredDate && (
-                      <div className="absolute bottom-3 left-3 flex h-14 w-14 flex-col items-center justify-center rounded-xl bg-white text-center shadow-lg">
-                        <span className="text-[10px] font-bold uppercase tracking-wide text-rose-600">
-                          {featuredDate.month}
-                        </span>
-                        <span className="text-xl font-extrabold leading-none text-slate-900">
-                          {featuredDate.day}
-                        </span>
-                      </div>
-                    )}
-                  </div>
+                  <div
+                    className="flex transition-transform duration-500 ease-out"
+                    style={{ transform: `translateX(-${safeSlide * 100}%)` }}
+                  >
+                    {featuredEvents.map((event, index) => {
+                      const eventDate = getDateParts(event.date);
+                      const eventPrice = getMinPrice(event.ticketTypes, event.price);
+                      return (
+                        <div key={event.id} className="w-full shrink-0">
+                          <div className="relative aspect-[16/10] overflow-hidden bg-slate-100 dark:bg-slate-800">
+                            <Image
+                              src={event.image || "/images/hero-bg.png"}
+                              alt={event.title}
+                              fill
+                              priority={index === 0}
+                              unoptimized
+                              sizes="(max-width: 1024px) 100vw, 420px"
+                              className="object-cover"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 via-transparent to-transparent" />
+                            <span className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-[11px] font-semibold text-slate-800 backdrop-blur">
+                              {t("home.featured")}
+                            </span>
+                            {eventDate && (
+                              <div className="absolute bottom-3 left-3 flex h-14 w-14 flex-col items-center justify-center rounded-xl bg-white text-center shadow-lg">
+                                <span className="text-[10px] font-bold uppercase tracking-wide text-rose-600">
+                                  {eventDate.month}
+                                </span>
+                                <span className="text-xl font-extrabold leading-none text-slate-900">
+                                  {eventDate.day}
+                                </span>
+                              </div>
+                            )}
+                          </div>
 
-                  <div className="p-4 sm:p-5">
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400">
-                      {featured.genre || featured.category}
-                    </p>
-                    <h2 className="mt-1 line-clamp-1 text-xl font-bold text-slate-900 dark:text-white">
-                      {featured.title}
-                    </h2>
-                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-500 dark:text-slate-400">
-                      <span className="inline-flex items-center gap-1.5">
-                        <CalendarDays className="h-4 w-4" />
-                        {getShortDate(featured.date)}
-                      </span>
-                      {featured.venue && (
-                        <span className="inline-flex items-center gap-1.5">
-                          <MapPin className="h-4 w-4" />
-                          {featured.venue}
-                          {featured.city ? `, ${featured.city}` : ""}
-                        </span>
-                      )}
-                    </div>
+                          <div className="p-4 sm:p-5">
+                            <p className="text-[11px] font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400">
+                              {event.genre || event.category}
+                            </p>
+                            <h2 className="mt-1 line-clamp-1 text-xl font-bold text-slate-900 dark:text-white">
+                              {event.title}
+                            </h2>
+                            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-500 dark:text-slate-400">
+                              <span className="inline-flex items-center gap-1.5">
+                                <CalendarDays className="h-4 w-4" />
+                                {getShortDate(event.date)}
+                              </span>
+                              {event.venue && (
+                                <span className="inline-flex items-center gap-1.5">
+                                  <MapPin className="h-4 w-4" />
+                                  {event.venue}
+                                  {event.city ? `, ${event.city}` : ""}
+                                </span>
+                              )}
+                            </div>
 
-                    <div className="mt-4 flex items-center justify-between gap-3 border-t border-slate-100 pt-4 dark:border-slate-800">
-                      <div>
-                        {featuredPrice !== undefined ? (
-                          <>
-                            <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
-                              {t("event.fromLabel")}
-                            </p>
-                            <p className="text-lg font-bold text-slate-900 dark:text-white">
-                              {formatCurrency(featuredPrice)}
-                            </p>
-                          </>
-                        ) : (
-                          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                            {t("home.currencyNote")}
-                          </p>
-                        )}
-                      </div>
-                      <Link
-                        href={`/events/${featured.id}`}
-                        className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
-                      >
-                        {t("home.getTickets")}
-                        <ArrowRight className="h-4 w-4" />
-                      </Link>
-                    </div>
+                            <div className="mt-4 flex items-center justify-between gap-3 border-t border-slate-100 pt-4 dark:border-slate-800">
+                              <div>
+                                {eventPrice !== undefined ? (
+                                  <>
+                                    <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                                      {t("event.fromLabel")}
+                                    </p>
+                                    <p className="text-lg font-bold text-slate-900 dark:text-white">
+                                      {formatCurrency(eventPrice)}
+                                    </p>
+                                  </>
+                                ) : (
+                                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                                    {t("home.currencyNote")}
+                                  </p>
+                                )}
+                              </div>
+                              <Link
+                                href={`/events/${event.id}`}
+                                className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+                              >
+                                {t("home.getTickets")}
+                                <ArrowRight className="h-4 w-4" />
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
+
+                {featuredCount > 1 && (
+                  <div className="mt-3 flex items-center justify-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => goToSlide(safeSlide - 1)}
+                      aria-label="Previous featured event"
+                      className="flex h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition-colors hover:bg-white/20"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </button>
+                    <div className="flex items-center gap-1.5">
+                      {featuredEvents.map((event, index) => (
+                        <button
+                          key={event.id}
+                          type="button"
+                          onClick={() => goToSlide(index)}
+                          aria-label={`Go to featured event ${index + 1}`}
+                          aria-current={index === safeSlide}
+                          className={`h-2 rounded-full transition-all ${
+                            index === safeSlide
+                              ? "w-6 bg-white"
+                              : "w-2 bg-white/40 hover:bg-white/70"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => goToSlide(safeSlide + 1)}
+                      aria-label="Next featured event"
+                      className="flex h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition-colors hover:bg-white/20"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -495,7 +567,7 @@ export default function HomePage() {
         </div>
 
         {upcoming.length > 0 ? (
-          <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
             {upcoming.slice(0, 9).map((event) => (
               <EventCard key={event.id} event={event} />
             ))}

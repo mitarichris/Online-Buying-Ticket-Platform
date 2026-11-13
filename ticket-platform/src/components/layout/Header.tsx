@@ -16,7 +16,6 @@ import {
 import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { HeaderSearch } from "@/components/layout/HeaderSearch";
 import { LanguageFlag } from "@/components/layout/LanguageFlag";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import { useLanguage } from "@/i18n/LanguageProvider";
@@ -70,9 +69,6 @@ export function Header() {
               </button>
             </div>
           </div>
-          <div className="px-4 pb-2">
-            <HeaderSearch onSearch={closeMenu} />
-          </div>
         </div>
 
         <div className="mx-auto hidden h-16 max-w-7xl items-center gap-3 px-4 sm:px-6 md:flex">
@@ -86,12 +82,6 @@ export function Header() {
               className="h-9 w-auto lg:h-10"
             />
           </Link>
-
-          <div className="flex flex-1 justify-center px-4">
-            <div className="w-full max-w-lg">
-              <HeaderSearch onSearch={closeMenu} />
-            </div>
-          </div>
 
           <div className="ml-auto flex items-center gap-1 sm:gap-2">
             <NotificationBell />
@@ -209,30 +199,6 @@ export function Header() {
           </div>
         )}
       </div>
-
-      <nav className="hidden border-b border-slate-200 bg-white md:block dark:border-slate-800 dark:bg-slate-900">
-        <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-4 py-2 scrollbar-hide sm:px-6">
-          <Link
-            href="/events"
-            className="inline-flex shrink-0 items-center rounded-md bg-slate-100 px-2.5 py-1.5 text-xs font-semibold text-slate-900 dark:bg-slate-800 dark:text-white"
-          >
-            {t("home.allCategories")}
-          </Link>
-          {categories.map((category) => {
-            const Icon = category.icon;
-            return (
-              <Link
-                key={category.slug}
-                href={`/events?category=${encodeURIComponent(category.slug)}`}
-                className="inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
-              >
-                <Icon className="h-3.5 w-3.5 text-slate-400" />
-                {t(category.labelKey)}
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
     </header>
   );
 }

@@ -70,12 +70,12 @@ export function EventCard({ event }: { event: EventCardEvent }) {
         )}
       </div>
 
-      <div className="flex flex-1 flex-col p-4">
-        <h3 className="line-clamp-2 text-base font-semibold text-slate-900 transition-colors group-hover:text-blue-700 dark:text-white dark:group-hover:text-blue-400">
+      <div className="flex flex-1 flex-col p-3 sm:p-4">
+        <h3 className="line-clamp-2 text-sm font-semibold text-slate-900 transition-colors group-hover:text-blue-700 sm:text-base dark:text-white dark:group-hover:text-blue-400">
           {event.title}
         </h3>
 
-        <div className="mt-2 space-y-1 text-xs text-slate-500 dark:text-slate-400">
+        <div className="mt-1.5 space-y-1 text-[11px] leading-snug text-slate-500 sm:mt-2 sm:text-xs dark:text-slate-400">
           <p className="flex items-center gap-1.5">
             <Clock className="h-3.5 w-3.5 shrink-0" />
             <span className="truncate">
@@ -94,25 +94,25 @@ export function EventCard({ event }: { event: EventCardEvent }) {
           )}
         </div>
 
-        <div className="mt-4 flex items-end justify-between gap-3 border-t border-slate-100 pt-3 dark:border-slate-800">
+        <div className="mt-3 flex flex-col gap-2 border-t border-slate-100 pt-2.5 sm:mt-4 sm:flex-row sm:items-end sm:justify-between sm:gap-3 sm:pt-3 dark:border-slate-800">
           <div className="min-w-0">
             {minPrice !== undefined ? (
               <>
                 <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
                   {t("event.fromLabel")}
                 </p>
-                <p className="text-base font-bold text-slate-900 dark:text-white">
+                <p className="text-sm font-bold text-slate-900 sm:text-base dark:text-white">
                   {formatCurrency(minPrice)}
                 </p>
               </>
             ) : (
-              <span className="inline-flex items-center gap-1 text-xs font-medium text-slate-500 dark:text-slate-400">
+              <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 sm:text-xs dark:text-slate-400">
                 <CalendarDays className="h-3.5 w-3.5" />
                 {t("home.viewDetails")}
               </span>
             )}
           </div>
-          <span className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition-colors group-hover:bg-blue-700">
+          <span className="inline-flex w-full shrink-0 items-center justify-center gap-1 rounded-lg bg-blue-600 px-2.5 py-2 text-[11px] font-semibold text-white transition-colors group-hover:bg-blue-700 sm:w-auto sm:px-3 sm:text-xs">
             {t("home.getTickets")}
             <ArrowRight className="h-3.5 w-3.5" />
           </span>
