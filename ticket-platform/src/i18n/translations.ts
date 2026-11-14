@@ -38,6 +38,9 @@ const en: Dict = {
   // Home
   "welcome.title": "Welcome to TicketHub",
   "welcome.subtitle": "Your next experience starts here.",
+  "welcome.chooseLanguage": "Choose your language",
+  "welcome.chooseLanguageSubtitle": "Select the language you'd like to use on TicketHub.",
+  "welcome.continue": "Continue",
   "home.hero.badge": "Rwanda's ticket marketplace",
   "home.hero.title": "Find your next event. Book in minutes.",
   "home.hero.subtitle": "Concerts, sports, theatre, conferences and more — secure your spot with instant e-tickets.",
@@ -557,6 +560,9 @@ const rw: Dict = {
 
   "welcome.title": "Murakaza neza kuri TicketHub",
   "welcome.subtitle": "Uburambe bwawe bukurikira butangira hano.",
+  "welcome.chooseLanguage": "Hitamo ururimi rwawe",
+  "welcome.chooseLanguageSubtitle": "Hitamo ururimi wifuza gukoresha kuri TicketHub.",
+  "welcome.continue": "Komeza",
   "home.hero.badge": "Isoko ry'amatike mu Rwanda",
   "home.hero.title": "Shakisha ikibaye gikurikira. Gura itike mu minota.",
   "home.hero.subtitle": "Ibirori by'umuziki, siporo, theater, amanama n'ibindi — bika umwanya wawe n'itike ihita.",
@@ -1051,6 +1057,9 @@ const fr: Dict = {
 
   "welcome.title": "Bienvenue sur TicketHub",
   "welcome.subtitle": "Votre prochaine expérience commence ici.",
+  "welcome.chooseLanguage": "Choisissez votre langue",
+  "welcome.chooseLanguageSubtitle": "Sélectionnez la langue que vous souhaitez utiliser sur TicketHub.",
+  "welcome.continue": "Continuer",
   "home.hero.badge": "La place des billets au Rwanda",
   "home.hero.title": "Trouvez votre prochain événement. Réservez en quelques minutes.",
   "home.hero.subtitle": "Concerts, sports, théâtre, conférences et plus encore — réservez votre place avec des e-billets instantanés.",
@@ -1545,6 +1554,9 @@ const sw: Dict = {
 
   "welcome.title": "Karibu TicketHub",
   "welcome.subtitle": "Uzoefu wako ujao unaanza hapa.",
+  "welcome.chooseLanguage": "Chagua lugha yako",
+  "welcome.chooseLanguageSubtitle": "Chagua lugha unayotaka kutumia kwenye TicketHub.",
+  "welcome.continue": "Endelea",
   "home.hero.badge": "Soko la tikiti la Rwanda",
   "home.hero.title": "Pata tukio lako linalofuata. Weka nafasi kwa dakika chache.",
   "home.hero.subtitle": "Matamasha, michezo, ukumbi wa michezo, makongamano na zaidi — hakikisha nafasi yako kwa tikiti za kielektroniki papo hapo.",
